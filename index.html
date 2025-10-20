@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies & Shows - Full Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        select, input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reset-btn {
+            background: #f0f0f0;
+            color: #333;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        table td {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .row-action-btn {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .delete-row-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-row-btn:hover {
+            background: #d32f2f;
+        }
+
+        .delete-row-btn.confirm-mode {
+            background: #ff9800;
+        }
+
+        .delete-row-btn.confirm-mode:hover {
+            background: #f57c00;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+
+        .required::after {
+            content: " *";
+            color: #d32f2f;
+        }
+
+        .row-selector {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .tabs {
+                justify-content: center;
+            }
+
+            .tab-button {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            table th, table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="https://dennyrgood.github.io/" class="back-link">← Back to Hub</a>
+
+        <div class="header">
+            <h1>🎬 Movies & Shows - Full Editor</h1>
+            <p>Add, edit, or delete entries</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="add">Add New</button>
+            <button class="tab-button" data-tab="edit">Edit Existing</button>
+            <button class="tab-button" data-tab="delete">Delete Entry</button>
+        </div>
+
+        <!-- Add Tab -->
+        <div id="add-tab" class="tab-content active">
+            <h2>Add New Entry</h2>
+            <form id="addForm">
+                <div class="form-group">
+                    <label for="add-code" class="required">Code (Number/Decimal)</label>
+                    <input type="number" id="add-code" name="code" step="0.1" placeholder="e.g., 1.1, 2000.1" required>
+                    <small style="color: #999;">Whole number = Who, Decimal = Status</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="add-title" class="required">Title</label>
+                    <input type="text" id="add-title" name="title" placeholder="Movie or show title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_g">First Season / Get</label>
+                    <input type="text" id="add-col_g" name="col_g" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_h">To Watch / Where</label>
+                    <input type="text" id="add-col_h" name="col_h" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_i">Seasons / Made</label>
+                    <input type="text" id="add-col_i" name="col_i" value="Download" placeholder="Default: Download">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_j">Season / Data Avail (Date)</label>
+                    <input type="text" id="add-col_j" name="col_j" placeholder="e.g., 1/1/2025 or 15-Jan-2025">
+                    <small style="color: #999;">Accepts: mm/dd/yyyy, dd-mmm-yyyy, yyyy-mm-dd</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_k">Website / Notes</label>
+                    <input type="text" id="add-col_k" name="col_k" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_l">Notes</label>
+                    <input type="text" id="add-col_l" name="col_l" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-col_m">Synopsis</label>
+                    <textarea id="add-col_m" name="col_m" placeholder="Optional"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">Add Entry</button>
+                    <button type="reset" class="reset-btn">Clear Form</button>
+                </div>
+
+                <div id="add-message" class="message"></div>
+            </form>
+        </div>
+
+        <!-- Edit Tab -->
+        <div id="edit-tab" class="tab-content">
+            <h2>Edit Existing Entry</h2>
+            <div class="row-selector">
+                <label for="edit-row-select">Select row to edit:</label>
+                <select id="edit-row-select">
+                    <option value="">-- Loading rows --</option>
+                </select>
+            </div>
+
+            <form id="editForm" style="display: none;">
+                <div class="form-group">
+                    <label for="edit-code" class="required">Code (Number/Decimal)</label>
+                    <input type="number" id="edit-code" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-title" class="required">Title</label>
+                    <input type="text" id="edit-title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_g">First Season / Get</label>
+                    <input type="text" id="edit-col_g">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_h">To Watch / Where</label>
+                    <input type="text" id="edit-col_h">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_i">Seasons / Made</label>
+                    <input type="text" id="edit-col_i">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_j">Season / Data Avail (Date)</label>
+                    <input type="text" id="edit-col_j" placeholder="e.g., 1/1/2025 or 15-Jan-2025">
+                    <small style="color: #999;">Accepts: mm/dd/yyyy, dd-mmm-yyyy, yyyy-mm-dd</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_k">Website / Notes</label>
+                    <input type="text" id="edit-col_k">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_l">Notes</label>
+                    <input type="text" id="edit-col_l">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-col_m">Synopsis</label>
+                    <textarea id="edit-col_m"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">Save Changes</button>
+                    <button type="reset" class="reset-btn">Cancel</button>
+                </div>
+
+                <div id="edit-message" class="message"></div>
+            </form>
+        </div>
+
+        <!-- Delete Tab -->
+        <div id="delete-tab" class="tab-content">
+            <h2>Delete Entry</h2>
+            <p style="margin-bottom: 20px; color: #666;">Click the delete button next to any entry. Click again to confirm deletion.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Row</th>
+                            <th>Code</th>
+                            <th>Title</th>
+                            <th>Season</th>
+                            <th>Watch</th>
+                            <th>Seasons</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delete-table-body">
+                        <tr>
+                            <td colspan="8" class="loading">Loading rows...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="delete-message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://api.ldmathes.cc';
+        let currentEditRow = null;
+        let allRows = [];
+        let deleteConfirmRow = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Update active button
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active content
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                
+                // Load data when switching to edit or delete tabs
+                if (tabName === 'edit' || tabName === 'delete') {
+                    loadRows(tabName);
+                }
+            });
+        });
+
+        // Load all rows from backend
+        async function loadRows(tab) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/data`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    allRows = data.data;
+                    
+                    if (tab === 'edit') {
+                        populateEditDropdown();
+                    } else if (tab === 'delete') {
+                        populateDeleteTable();
+                    }
+                } else {
+                    showMessage('Error loading rows: ' + data.message, 'error', tab);
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', tab);
+            }
+        }
+
+        // Populate edit dropdown
+        function populateEditDropdown() {
+            const select = document.getElementById('edit-row-select');
+            select.innerHTML = '<option value="">-- Select an entry to edit --</option>';
+            
+            allRows.forEach(row => {
+                const option = document.createElement('option');
+                option.value = row.row_index;
+                option.textContent = `Row ${row.row_index}: ${row.code || ''} - ${row.title || 'Untitled'}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Populate delete table
+        function populateDeleteTable() {
+            const tbody = document.getElementById('delete-table-body');
+            tbody.innerHTML = '';
+            deleteConfirmRow = null;
+            
+            allRows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.row_index}</td>
+                    <td>${row.code || ''}</td>
+                    <td>${row.title || ''}</td>
+                    <td>${row.col_g || ''}</td>
+                    <td>${row.col_h || ''}</td>
+                    <td>${row.col_i || ''}</td>
+                    <td>${row.col_j || ''}</td>
+                    <td>
+                        <button class="row-action-btn delete-row-btn" data-row="${row.row_index}" data-title="${row.title || 'Untitled'}">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Attach event listeners to delete buttons
+            document.querySelectorAll('.delete-row-btn').forEach(btn => {
+                btn.addEventListener('click', handleDeleteClick);
+            });
+        }
+
+        // Handle delete button click (two-step confirmation)
+        function handleDeleteClick(e) {
+            const btn = e.target;
+            const rowIndex = parseInt(btn.dataset.row);
+            const title = btn.dataset.title;
+            
+            if (deleteConfirmRow === rowIndex) {
+                // Second click - proceed with delete
+                deleteRow(rowIndex, title);
+                deleteConfirmRow = null;
+            } else {
+                // First click - show confirmation state
+                deleteConfirmRow = rowIndex;
+                
+                // Reset all other buttons
+                document.querySelectorAll('.delete-row-btn').forEach(b => {
+                    b.textContent = 'Delete';
+                    b.classList.remove('confirm-mode');
+                });
+                
+                // Set this button to confirm mode
+                btn.textContent = 'Confirm Delete?';
+                btn.classList.add('confirm-mode');
+                
+                showMessage(`Click "Confirm Delete?" again to permanently delete Row ${rowIndex}: ${title}`, 'info', 'delete');
+            }
+        }
+
+        // Edit dropdown change
+        document.getElementById('edit-row-select').addEventListener('change', function() {
+            const rowIndex = parseInt(this.value);
+            
+            if (!rowIndex) {
+                document.getElementById('editForm').style.display = 'none';
+                currentEditRow = null;
+                return;
+            }
+            
+            const row = allRows.find(r => r.row_index === rowIndex);
+            if (row) {
+                currentEditRow = row;
+                document.getElementById('edit-code').value = row.code || '';
+                document.getElementById('edit-title').value = row.title || '';
+                document.getElementById('edit-col_g').value = row.col_g || '';
+                document.getElementById('edit-col_h').value = row.col_h || '';
+                document.getElementById('edit-col_i').value = row.col_i || '';
+                document.getElementById('edit-col_j').value = row.col_j || '';
+                document.getElementById('edit-col_k').value = row.col_k || '';
+                document.getElementById('edit-col_l').value = row.col_l || '';
+                document.getElementById('edit-col_m').value = row.col_m || '';
+                document.getElementById('editForm').style.display = 'block';
+            }
+        });
+
+        // Add form submission
+        document.getElementById('addForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const payload = {
+                code: document.getElementById('add-code').value,
+                title: document.getElementById('add-title').value,
+                col_g: document.getElementById('add-col_g').value,
+                col_h: document.getElementById('add-col_h').value,
+                col_i: document.getElementById('add-col_i').value,
+                col_j: document.getElementById('add-col_j').value,
+                col_k: document.getElementById('add-col_k').value,
+                col_l: document.getElementById('add-col_l').value,
+                col_m: document.getElementById('add-col_m').value
+            };
+            
+            try {
+                const btn = document.querySelector('#addForm .submit-btn');
+                btn.disabled = true;
+                btn.textContent = 'Adding...';
+                
+                const response = await fetch(`${BACKEND_URL}/api/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}`, 'success', 'add');
+                    this.reset();
+                    document.getElementById('add-col_i').value = 'Download';
+                    allRows = [];
+                } else {
+                    showMessage(`✗ ${data.message}`, 'error', 'add');
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'add');
+            } finally {
+                const btn = document.querySelector('#addForm .submit-btn');
+                btn.disabled = false;
+                btn.textContent = 'Add Entry';
+            }
+        });
+
+        // Edit form submission
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentEditRow) return;
+            
+            const payload = {
+                row_index: currentEditRow.row_index,
+                code: document.getElementById('edit-code').value,
+                title: document.getElementById('edit-title').value,
+                col_g: document.getElementById('edit-col_g').value,
+                col_h: document.getElementById('edit-col_h').value,
+                col_i: document.getElementById('edit-col_i').value,
+                col_j: document.getElementById('edit-col_j').value,
+                col_k: document.getElementById('edit-col_k').value,
+                col_l: document.getElementById('edit-col_l').value,
+                col_m: document.getElementById('edit-col_m').value
+            };
+            
+            try {
+                const btn = document.querySelector('#editForm .submit-btn');
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+                
+                const response = await fetch(`${BACKEND_URL}/api/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}`, 'success', 'edit');
+                    allRows = [];
+                    document.getElementById('edit-row-select').value = '';
+                    document.getElementById('editForm').style.display = 'none';
+                } else {
+                    showMessage(`✗ ${data.message}`, 'error', 'edit');
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'edit');
+            } finally {
+                const btn = document.querySelector('#editForm .submit-btn');
+                btn.disabled = false;
+                btn.textContent = 'Save Changes';
+            }
+        });
+
+        // Delete function
+        async function deleteRow(rowIndex, title) {
+            showMessage(`Deleting Row ${rowIndex}: ${title}...`, 'info', 'delete');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowIndex })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}`, 'success', 'delete');
+                    allRows = [];
+                    loadRows('delete');
+                } else {
+                    showMessage(`✗ ${data.message}`, 'error', 'delete');
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'delete');
+            }
+        }
+
+        // Show message
+        function showMessage(text, type, tab) {
+            const msgDiv = document.getElementById(`${tab}-message`);
+            msgDiv.textContent = text;
+            msgDiv.className = `message show ${type}`;
+            msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Initial setup
+        document.getElementById('add-col_i').value = 'Download';
+    </script>
+</body>
+</html>
