@@ -343,6 +343,9 @@
         <!-- Add Tab -->
         <div id="add-tab" class="tab-content active">
             <h2>Add New Entry</h2>
+            <p style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-bottom: 20px; color: #856404; border: 1px solid #ffeaa7;">
+                ⚠️ <strong>Reminder:</strong> This process will strip out any images from all tabs of the spreadsheet.
+            </p>
             <form id="addForm">
                 <div class="form-group">
                     <label for="add-code" class="required">Code (Number/Decimal)</label>
@@ -496,7 +499,7 @@
     </div>
 
     <script>
-        const BACKEND_URL = 'https://api-edit.ldmathes.cc';
+        const BACKEND_URL = 'https://api.ldmathes.cc';
         let currentEditRow = null;
         let allRows = [];
         let deleteConfirmRow = null;
