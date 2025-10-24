@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Movies & Shows — Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --page-bg: linear-gradient(135deg,#667eea 0%,#764ba2 100%); --card-bg: #fff; }
+    html,body { height:100%; }
+    body {
+      margin:0; padding:20px; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--page-bg);
+      color:#222;
+    }
+    .app { max-width:1200px; margin:0 auto; }
+    .card{ border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.12); background:var(--card-bg); padding:16px; }
+    .editable { cursor:text; }
+    td.editing { background:#fff3cd; }
+    .small-muted { color:#6c757d; font-size:.9em; }
+    .btn-ghost { background:transparent; border:1px solid #e9ecef; color: #222; }
+    .table-responsive{ max-height:60vh; overflow:auto; }
+    .truncate { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:320px; display:inline-block; vertical-align:middle; }
+    @media (max-width:768px){ .truncate { max-width:160px; } }
+    .topbar { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .action-btns { display:flex; gap:8px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h3 class="text-white mb-0">🎬 Movies & Shows — Full Editor</h3>
+        <div class="small-muted">Single dashboard: search • inline edit • add • duplicate • delete • paginate</div>
+      </div>
+      <div class="action-btns">
+        <button id="btnAddNew" class="btn btn-success">+ Add New</button>
+        <button id="btnRefresh" class="btn btn-ghost">⟳ Refresh</button>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text">🔎</span>
+            <input id="search" class="form-control" placeholder="Search all columns (case-insensitive)">
+          </div>
+        </div>
+        <div class="col-md-3 text-end small-muted">
+          Per page:
+          <select id="perPage" class="form-select d-inline-block" style="width:auto">
+            <option>25</option><option>50</option><option selected>100</option><option>200</option>
+          </select>
+        </div>
+        <div class="col-md-3 text-end small-muted">
+          <span id="statusMsg"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="table-responsive">
+        <table id="grid" class="table table-striped table-hover mb-0">
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <nav>
+          <ul id="pager" class="pagination mb-0"></ul>
+        </nav>
+        <div class="small-muted">Showing <span id="showing"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <div class="modal fade" id="modalRecord" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 id="modalTitle" class="modal-title">Add / Edit Record</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="recordForm" class="row g-3">
+            <!-- fields injected dynamically -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="saveRecordBtn" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal fade" id="modalDelete" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="deletePrompt"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*****************************************************************
+ * Backend base URL (your existing tunnel address from original)
+ * All API calls use this prefix. No backup/export endpoints here.
+ *****************************************************************/
+const BACKEND_URL = 'https://api.ldmathes.cc';
+
+// Application state
+let PER_PAGE = parseInt(document.getElementById('perPage').value, 10);
+let currentPage = 1;
+let headers = [];            // header names (keys)
+let rows = [];               // array of row objects as returned by /api/data
+let filtered = [];
+let selectedRow = null;      // used for edit/duplicate/delete
+const editableKeys = ['code','title','col_g','col_h','col_i','col_j','col_k','col_l','col_m'];
+
+const thead = document.getElementById('thead');
+const tbody = document.getElementById('tbody');
+const pager = document.getElementById('pager');
+const searchInput = document.getElementById('search');
+const statusMsg = document.getElementById('statusMsg');
+
+let bsModalRecord, bsModalDelete;
+document.addEventListener('DOMContentLoaded', ()=>{
+  bsModalRecord = new bootstrap.Modal(document.getElementById('modalRecord'));
+  bsModalDelete = new bootstrap.Modal(document.getElementById('modalDelete'));
+  document.getElementById('btnAddNew').addEventListener('click', ()=> openRecordModal('add', null));
+  document.getElementById('btnRefresh').addEventListener('click', ()=> loadAllRows());
+  document.getElementById('perPage').addEventListener('change', ()=> { currentPage=1; renderTable(); });
+  searchInput.addEventListener('input', ()=> applyFilterAndRender());
+  loadAllRows();
+});
+
+function setStatus(msg, isError=false, timeout=3000) {
+  statusMsg.textContent = msg;
+  statusMsg.style.color = isError ? '#dc3545' : '#333';
+  if (timeout>0) setTimeout(()=>{ if(statusMsg.textContent===msg) statusMsg.textContent=''; }, timeout);
+}
+
+async function apiFetch(path, opts={}) {
+  const url = BACKEND_URL + path;
+  try {
+    const r = await fetch(url, opts);
+    if (!r.ok) {
+      const txt = await r.text().catch(()=>null);
+      throw new Error(`HTTP ${r.status} ${txt||r.statusText}`);
+    }
+    const ct = r.headers.get('content-type')||'';
+    if (ct.includes('application/json')) return await r.json();
+    return await r.blob();
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function loadAllRows(){
+  setStatus('Loading...');
+  try {
+    const res = await apiFetch('/api/data');
+    if (res && res.status === 'success' && Array.isArray(res.data)) {
+      rows = res.data;
+    } else if (Array.isArray(res)) {
+      rows = res;
+    } else {
+      throw new Error('Unexpected /api/data response');
+    }
+    if (rows.length>0) {
+      // derive headers from first object, keep Excel order by using editableKeys first
+      const allKeys = Object.keys(rows[0]).filter(k => k !== 'row_index');
+      // build headers with editableKeys order if present
+      headers = editableKeys.filter(k => allKeys.includes(k)).concat(allKeys.filter(k => !editableKeys.includes(k)));
+    } else {
+      headers = editableKeys.slice();
+    }
+    applyFilterAndRender();
+    setStatus('Loaded ' + rows.length + ' rows');
+  } catch (err) {
+    console.error(err);
+    setStatus('Load failed: ' + err.message, true, 8000);
+    rows = [];
+    headers = editableKeys.slice();
+    applyFilterAndRender();
+  }
+}
+
+function applyFilterAndRender(){
+  const q = (searchInput.value || '').toLowerCase().trim();
+  filtered = rows.filter(r => {
+    if (!q) return true;
+    return Object.values(r).some(v => (v||'').toString().toLowerCase().includes(q));
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable(){
+  PER_PAGE = parseInt(document.getElementById('perPage').value, 10) || 100;
+  const total = filtered.length;
+  const start = (currentPage-1) * PER_PAGE;
+  const pageRows = filtered.slice(start, start + PER_PAGE);
+
+  // header
+  thead.innerHTML = '';
+  const hdr = document.createElement('tr');
+  hdr.innerHTML = '<th style="width:60px">Row</th>';
+  headers.forEach(h => hdr.insertAdjacentHTML('beforeend', `<th>${h}</th>`));
+  hdr.insertAdjacentHTML('beforeend', '<th style="width:140px">Actions</th>');
+  thead.appendChild(hdr);
+
+  // body
+  tbody.innerHTML = '';
+  for (let i=0;i<pageRows.length;i++){
+    const r = pageRows[i];
+    const tr = document.createElement('tr');
+    const rowDisplay = r.row_index ?? (start + i + 1);
+    tr.insertAdjacentHTML('beforeend', `<td class="small-muted">${rowDisplay}</td>`);
+    headers.forEach(h => {
+      const td = document.createElement('td');
+      td.className = editableKeys.includes(h) ? 'editable' : '';
+      const val = r[h] == null ? '' : r[h];
+      td.innerHTML = `<div class="truncate" title="${String(val).replace(/"/g,'&quot;')}">${val}</div>`;
+      if (editableKeys.includes(h)) {
+        td.addEventListener('dblclick', () => startInlineEdit(td, r, h));
+      }
+      tr.appendChild(td);
+    });
+
+    // actions
+    const actions = document.createElement('td');
+    actions.innerHTML = `
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-primary" data-action="edit">✏️ Edit</button>
+        <button class="btn btn-sm btn-outline-success" data-action="dup">⎘ Duplicate</button>
+        <button class="btn btn-sm btn-outline-danger" data-action="delete">🗑 Delete</button>
+      </div>`;
+    actions.querySelector('[data-action="edit"]').addEventListener('click', ()=> openRecordModal('edit', r));
+    actions.querySelector('[data-action="dup"]').addEventListener('click', ()=> openRecordModal('duplicate', r));
+    actions.querySelector('[data-action="delete"]').addEventListener('click', ()=> openDeleteModal(r));
+    tr.appendChild(actions);
+
+    tbody.appendChild(tr);
+  }
+
+  buildPager(total);
+  document.getElementById('showing').textContent = `${Math.min(start+1,total)}–${Math.min(start+PER_PAGE,total)} of ${total}`;
+}
+
+function buildPager(total){
+  pager.innerHTML = '';
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+  const range = pagerRange(currentPage, pages, 7);
+  range.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'page-item' + (p===currentPage ? ' active' : '');
+    li.innerHTML = `<a class="page-link" href="#">${p}</a>`;
+    li.addEventListener('click', (ev)=>{ ev.preventDefault(); currentPage = p; renderTable(); });
+    pager.appendChild(li);
+  });
+}
+
+function pagerRange(curr, total, maxButtons){
+  const half = Math.floor(maxButtons/2);
+  let start = Math.max(1, curr - half);
+  let end = Math.min(total, curr + half);
+  if (end - start + 1 < maxButtons){
+    start = Math.max(1, end - maxButtons + 1);
+    end = Math.min(total, start + maxButtons - 1);
+  }
+  const out = [];
+  for (let i=start;i<=end;i++) out.push(i);
+  return out;
+}
+
+// Inline editing
+function startInlineEdit(td, rowObj, key){
+  if (td.classList.contains('editing')) return;
+  td.classList.add('editing');
+  const currentText = (rowObj[key] == null ? '' : rowObj[key]);
+  td.innerHTML = '';
+  const input = document.createElement('input');
+  input.className = 'form-control form-control-sm';
+  input.value = currentText;
+  td.appendChild(input);
+  input.focus();
+  input.addEventListener('blur', async ()=>{
+    await commitInlineEdit(input, td, rowObj, key);
+  });
+  input.addEventListener('keydown', async (ev)=>{
+    if (ev.key==='Enter'){ input.blur(); }
+    if (ev.key==='Escape'){ td.innerHTML = `<div class="truncate" title="${currentText}">${currentText}</div>`; td.classList.remove('editing'); }
+  });
+}
+
+async function commitInlineEdit(input, td, rowObj, key){
+  const newVal = input.value;
+  td.classList.remove('editing');
+  td.innerHTML = `<div class="truncate" title="${newVal}">${newVal}</div>`;
+  if ((rowObj[key] ?? '') === newVal) return;
+  // patch object and send to /api/update
+  const payload = Object.assign({}, rowObj);
+  payload[key] = newVal;
+  try {
+    setStatus('Saving...');
+    await apiFetch('/api/update', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    // refresh dataset to ensure formulas / formatting consistent
+    await loadAllRows();
+    setStatus('Saved');
+  } catch (err) {
+    console.error(err);
+    setStatus('Save failed: '+err.message, true, 5000);
+    td.innerHTML = `<div class="truncate" title="${rowObj[key] ?? ''}">${rowObj[key] ?? ''}</div>`;
+  }
+}
+
+// Record modal (add / edit / duplicate)
+function openRecordModal(mode, row){
+  selectedRow = row ? Object.assign({}, row) : null;
+  const form = document.getElementById('recordForm');
+  form.innerHTML = '';
+  const titleMap = { add:'Add New Record', edit:'Edit Record', duplicate:'Add Copy of Record' };
+  document.getElementById('modalTitle').textContent = titleMap[mode] || 'Record';
+
+  const keys = editableKeys.slice();
+  keys.forEach(k => {
+    const val = (selectedRow && selectedRow[k] != null) ? selectedRow[k] : (k==='col_i' ? 'Download' : '');
+    const id = 'f_'+k;
+    const div = document.createElement('div'); div.className = 'col-md-6';
+    div.innerHTML = `<label class="form-label">${k}</label>
+                     <input id="${id}" name="${k}" class="form-control" value="${val}">`;
+    form.appendChild(div);
+  });
+
+  if (mode === 'edit') {
+    const rid = document.createElement('input'); rid.type='hidden'; rid.name='row_index'; rid.value = selectedRow.row_index;
+    form.appendChild(rid);
+  }
+
+  bsModalRecord.show();
+
+  const saveBtn = document.getElementById('saveRecordBtn');
+  saveBtn.onclick = async (ev) => {
+    ev.preventDefault();
+    const fd = Object.fromEntries(new FormData(form).entries());
+    if (fd.code) fd.code = fd.code.toString();
+    const endpoint = (mode === 'add' || mode === 'duplicate') ? '/api/add' : '/api/update';
+    if (mode === 'duplicate') delete fd.row_index;
+    try {
+      setStatus('Saving...');
+      await apiFetch(endpoint, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(fd)
+      });
+      await loadAllRows();
+      bsModalRecord.hide();
+      setStatus((mode==='duplicate'?'Duplicated':'Saved'));
+    } catch (err) {
+      console.error(err);
+      setStatus('Save failed: '+err.message, true, 6000);
+    }
+  };
+}
+
+// Delete modal
+function openDeleteModal(row){
+  selectedRow = row;
+  document.getElementById('deletePrompt').textContent = `Delete row ${row.row_index}: ${row.title || '(untitled)'} — this cannot be undone.`;
+  bsModalDelete.show();
+  document.getElementById('confirmDeleteBtn').onclick = async ()=>{
+    try {
+      setStatus('Deleting...');
+      await apiFetch('/api/delete', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ row_index: selectedRow.row_index })
+      });
+      bsModalDelete.hide();
+      await loadAllRows();
+      setStatus('Deleted');
+    } catch (err) {
+      console.error(err);
+      setStatus('Delete failed: '+err.message, true, 6000);
+    }
+  };
+}
+
+// small UX: double-click header to sort by column (stable ascending)
+thead.addEventListener('dblclick', (ev)=>{
+  const th = ev.target.closest('th');
+  if (!th) return;
+  const col = th.textContent.trim();
+  if (!headers.includes(col)) return;
+  filtered.sort((a,b)=> {
+    const av = (a[col] ?? '').toString().toLowerCase();
+    const bv = (b[col] ?? '').toString().toLowerCase();
+    if (av < bv) return -1; if (av>bv) return 1; return 0;
+  });
+  currentPage = 1;
+  renderTable();
+});
+
+// convenience refresh on double-click search
+searchInput.addEventListener('dblclick', ()=> loadAllRows());
+
+// global error handler for status bar
+window.addEventListener('error', (e)=> setStatus('JS error: ' + e.message, true, 8000));
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
