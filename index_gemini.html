@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies & Shows - Full Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        /* --- Tab Styles --- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 8px 8px 0 0;
+            transition: background 0.3s, color 0.3s;
+            margin: 0 5px;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-button:not(.active):hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            background: white;
+            padding: 25px;
+            border-radius: 0 8px 8px 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* --- Form Styles --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+            grid-column: 1 / -1; /* Span all columns in the grid */
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #556ee4;
+        }
+
+        .btn-primary:disabled {
+            background-color: #a8b0e6;
+            cursor: not-allowed;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-delete:hover { background-color: #c82333; }
+
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+            margin-right: 5px;
+        }
+        .btn-save:hover { background-color: #1e7e34; }
+        
+        /* --- Message Styles --- */
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s, height 0.5s, padding 0.5s;
+        }
+
+        .message.show {
+            opacity: 1;
+            height: auto;
+            padding: 15px;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        /* --- Table Styles --- */
+        .data-table-container {
+            overflow-x: auto;
+            max-height: 70vh; /* Limit height for long tables */
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+        }
+
+        .data-table th {
+            background-color: #f4f4f4;
+            font-weight: 700;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .data-table td input[type="text"], 
+        .data-table td input[type="number"],
+        .data-table td select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+            min-width: 80px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Movies & Shows Data Editor</h1>
+            <p>Manage entries in the Excel database via the Flask API.</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('data-view')">Data View (Edit/Delete)</button>
+            <button class="tab-button" onclick="openTab('add-new')">Add New Entry</button>
+        </div>
+
+        <!-- Data View / Edit / Delete Tab -->
+        <div id="data-view" class="tab-content">
+            <div id="data-view-message" class="message"></div>
+            <p style="margin-bottom: 15px; font-weight: bold;">Click 'Edit' to make changes, or 'Delete' to remove a row.</p>
+            <div id="data-table-container" class="data-table-container">
+                <p>Loading data...</p>
+            </div>
+        </div>
+
+        <!-- Add New Entry Tab (Simplified Add Form) -->
+        <div id="add-new" class="tab-content hidden">
+            <h2>Add New Movie/Show</h2>
+            <div id="add-message" class="message"></div>
+            <form id="add-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="add-code">Code (A)</label>
+                        <input type="number" id="add-code" name="code" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-title">Title (F)</label>
+                        <input type="text" id="add-title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_g">Genre (G)</label>
+                        <input type="text" id="add-col_g" name="col_g">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_h">Type (H)</label>
+                        <input type="text" id="add-col_h" name="col_h">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_i">Location/Status (I)</label>
+                        <input type="text" id="add-col_i" name="col_i" value="Download">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_j">Date Watched (J)</label>
+                        <input type="text" id="add-col_j" name="col_j" placeholder="DD-MMM-YYYY or YYYY-MM-DD">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_k">Rating (K)</label>
+                        <input type="number" id="add-col_k" name="col_k" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_l">Notes (L)</label>
+                        <input type="text" id="add-col_l" name="col_l">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-col_m">Actors (M)</label>
+                        <input type="text" id="add-col_m" name="col_m">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Submit New Entry</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://127.0.0.1:5000';
+        const dataViewContainer = document.getElementById('data-table-container');
+        let allRows = [];
+        let currentlyEditingRow = null;
+
+        // Map for editable fields
+        const FIELD_MAP = [
+            { key: 'code', label: 'Code (A)', type: 'number', required: true },
+            { key: 'title', label: 'Title (F)', type: 'text', required: true },
+            { key: 'col_g', label: 'Genre (G)', type: 'text' },
+            { key: 'col_h', label: 'Type (H)', type: 'text' },
+            { key: 'col_i', label: 'Status (I)', type: 'text' },
+            { key: 'col_j', label: 'Date (J)', type: 'text' },
+            { key: 'col_k', label: 'Rating (K)', type: 'number', step: '0.1' },
+            { key: 'col_l', label: 'Notes (L)', type: 'text' },
+            { key: 'col_m', label: 'Actors (M)', type: 'text' }
+        ];
+
+        // --- Utility Functions ---
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.remove('hidden');
+            document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
+
+            if (tabName === 'data-view') {
+                loadRows('data-view');
+            }
+        }
+
+        function showMessage(text, type, tab) {
+            const msgDiv = document.getElementById(`${tab}-message`);
+            msgDiv.textContent = text;
+            msgDiv.className = `message show ${type}`;
+            msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            setTimeout(() => {
+                msgDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // --- API & Data Functions ---
+
+        async function loadRows(tab) {
+            showMessage('Loading data from Excel...', 'warning', tab);
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/data`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0)); // Sort by code descending
+                    renderTable(tab);
+                    showMessage(`✓ Successfully loaded ${allRows.length} rows.`, 'success', tab);
+                } else {
+                    showMessage(`✗ Error loading data: ${data.message}`, 'error', tab);
+                    dataViewContainer.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                showMessage(`✗ Network error: Could not connect to backend at ${BACKEND_URL}. ${error.message}`, 'error', tab);
+                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure Flask server is running at ${BACKEND_URL}.</p>`;
+            }
+        }
+        
+        // --- Table Rendering and Interaction ---
+
+        function renderTable(tab) {
+            if (allRows.length === 0) {
+                dataViewContainer.innerHTML = `<p>No data found or table is empty.</p>`;
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'data-table';
+            
+            // Generate headers
+            const thead = table.createTHead();
+            let headers = ['Row Index', ...FIELD_MAP.map(f => f.label), 'Action'];
+            let headerRow = thead.insertRow();
+            headers.forEach(text => {
+                let th = document.createElement('th');
+                th.textContent = text;
+                headerRow.appendChild(th);
+            });
+
+            // Generate body
+            const tbody = table.createTBody();
+            allRows.forEach(row => {
+                const tr = tbody.insertRow();
+                tr.dataset.rowIndex = row.row_index;
+
+                // Row Index Cell
+                let cellIndex = tr.insertCell();
+                cellIndex.textContent = row.row_index;
+
+                // Data Cells
+                FIELD_MAP.forEach(field => {
+                    let td = tr.insertCell();
+                    td.dataset.fieldKey = field.key;
+                    td.textContent = row[field.key] !== null && row[field.key] !== undefined ? row[field.key] : '';
+                });
+
+                // Action Cell
+                let cellAction = tr.insertCell();
+                cellAction.innerHTML = `
+                    <button class="btn-save" onclick="toggleEdit(${row.row_index}, this)">Edit</button>
+                    <button class="btn-delete" onclick="deleteRow(${row.row_index}, '${row.title}')">Delete</button>
+                `;
+            });
+
+            dataViewContainer.innerHTML = '';
+            dataViewContainer.appendChild(table);
+        }
+
+        function toggleEdit(rowIndex, button) {
+            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            const isEditing = row.classList.contains('editing');
+
+            if (isEditing) {
+                saveRow(rowIndex, row);
+                currentlyEditingRow = null;
+            } else {
+                if (currentlyEditingRow !== null) {
+                    showMessage('Please save or cancel the currently edited row before starting a new one.', 'warning', 'data-view');
+                    return;
+                }
+
+                row.classList.add('editing');
+                currentlyEditingRow = rowIndex;
+                
+                // Switch button text/color
+                button.textContent = 'Save';
+                button.style.backgroundColor = '#17a2b8'; // Info blue for Save
+
+                // Convert data cells to input fields
+                row.querySelectorAll('td[data-field-key]').forEach(td => {
+                    const fieldKey = td.dataset.fieldKey;
+                    const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
+                    const originalValue = td.textContent;
+
+                    let input = document.createElement('input');
+                    input.type = fieldInfo.type || 'text';
+                    input.value = originalValue;
+                    input.className = 'edit-field';
+                    input.dataset.key = fieldKey;
+                    if (fieldInfo.step) input.step = fieldInfo.step;
+                    
+                    td.textContent = '';
+                    td.appendChild(input);
+                });
+                
+                // Add Cancel button
+                const actionCell = row.cells[row.cells.length - 1];
+                actionCell.innerHTML = `
+                    <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Save</button>
+                    <button class="btn-delete" onclick="cancelEdit(${rowIndex}, this)">Cancel</button>
+                `;
+            }
+        }
+        
+        function cancelEdit(rowIndex, button) {
+            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            if (!row) return;
+
+            row.classList.remove('editing');
+            currentlyEditingRow = null;
+            
+            const originalRowData = allRows.find(r => r.row_index === rowIndex);
+            
+            // Restore original text content
+            row.querySelectorAll('td[data-field-key]').forEach(td => {
+                const fieldKey = td.dataset.fieldKey;
+                td.textContent = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
+            });
+
+            // Restore action buttons
+            const actionCell = row.cells[row.cells.length - 1];
+            actionCell.innerHTML = `
+                <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Edit</button>
+                <button class="btn-delete" onclick="deleteRow(${rowIndex}, '${originalRowData.title}')">Delete</button>
+            `;
+        }
+
+        async function saveRow(rowIndex, row) {
+            showMessage('Saving changes...', 'warning', 'data-view');
+            
+            const payload = { row_index: rowIndex };
+            let hasChanges = false;
+            
+            // Collect data from input fields
+            row.querySelectorAll('.edit-field').forEach(input => {
+                const key = input.dataset.key;
+                const newValue = input.value;
+                payload[key] = newValue;
+                hasChanges = true;
+            });
+            
+            if (!hasChanges) {
+                showMessage('No changes detected.', 'warning', 'data-view');
+                cancelEdit(rowIndex);
+                return;
+            }
+
+            // Client-side validation for required fields
+            if (!payload.code || !payload.title) {
+                 showMessage('Code and Title fields cannot be empty.', 'error', 'data-view');
+                 return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    currentlyEditingRow = null;
+                    loadRows('data-view'); // Reload data to show changes and updated formulas
+                } else {
+                    // Revert edit state on failure
+                    row.classList.remove('editing');
+                    currentlyEditingRow = null;
+                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    loadRows('data-view'); // Reload original data
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+            }
+        }
+
+        async function deleteRow(rowNum, title) {
+            // FIX 1: Replace illegal 'confirm()' with a non-blocking UI flow.
+            // In compliance with platform rules, we skip the blocking dialog and proceed 
+            // directly, relying on the 'Delete' button being a deliberate action.
+            
+            showMessage(`Attempting to delete Row ${rowNum}: ${title}...`, 'warning', 'data-view');
+
+            try {
+                // FIX 2: Correct endpoint to match Flask backend and use correct parameter name.
+                const response = await fetch(`${BACKEND_URL}/api/delete`, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowNum }) // Flask expects 'row_index'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    allRows = [];
+                    loadRows('data-view'); // Reload the table
+                } else {
+                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+            }
+        }
+
+        // --- Add New Entry Logic ---
+        document.getElementById('add-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('.btn-primary');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            // Collect data
+            const formData = new FormData(form);
+            const payload = {};
+            for (const [key, value] of formData.entries()) {
+                payload[key] = value.trim();
+            }
+
+            // Client-side validation
+            if (!payload.code || !payload.title) {
+                showMessage("Code and Title are required fields.", 'error', 'add-new');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit New Entry';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    showMessage(`✓ ${data.message}. Now available in Data View.`, 'success', 'add-new');
+                    form.reset();
+                    document.getElementById('add-col_i').value = 'Download'; // Reset default
+                    // Automatically switch to data view to show the new entry
+                    openTab('data-view'); 
+                } else {
+                    showMessage(`✗ ${data.message}`, 'error', 'add-new');
+                }
+            } catch (error) {
+                showMessage(`Network error: ${error.message}`, 'error', 'add-new');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit New Entry';
+            }
+        });
+
+        // Initial load
+        window.onload = () => {
+            loadRows('data-view');
+            document.getElementById('add-col_i').value = 'Download';
+        };
+    </script>
+</body>
+</html>
