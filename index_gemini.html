@@ -312,6 +312,7 @@
     </div>
 
     <script>
+        // UPDATED: Changed the BACKEND_URL to the specified production endpoint.
         const BACKEND_URL = 'https://api-edit.ldmathes.cc';
         const dataViewContainer = document.getElementById('data-table-container');
         let allRows = [];
@@ -363,6 +364,7 @@
         async function loadRows(tab) {
             showMessage('Loading data from Excel...', 'warning', tab);
             try {
+                // Uses the updated BACKEND_URL
                 const response = await fetch(`${BACKEND_URL}/api/data`);
                 const data = await response.json();
 
@@ -376,7 +378,7 @@
                 }
             } catch (error) {
                 showMessage(`✗ Network error: Could not connect to backend at ${BACKEND_URL}. ${error.message}`, 'error', tab);
-                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure Flask server is running at ${BACKEND_URL}.</p>`;
+                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure backend service is running and accessible at ${BACKEND_URL}.</p>`;
             }
         }
         
@@ -526,6 +528,7 @@
             }
 
             try {
+                // Uses the updated BACKEND_URL
                 const response = await fetch(`${BACKEND_URL}/api/update`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -551,18 +554,17 @@
         }
 
         async function deleteRow(rowNum, title) {
-            // FIX 1: Replace illegal 'confirm()' with a non-blocking UI flow.
-            // In compliance with platform rules, we skip the blocking dialog and proceed 
-            // directly, relying on the 'Delete' button being a deliberate action.
+            // Updated to be platform-compliant (no blocking dialogs) and synchronize endpoint/key
             
             showMessage(`Attempting to delete Row ${rowNum}: ${title}...`, 'warning', 'data-view');
 
             try {
-                // FIX 2: Correct endpoint to match Flask backend and use correct parameter name.
+                // Uses the updated BACKEND_URL
                 const response = await fetch(`${BACKEND_URL}/api/delete`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ row_index: rowNum }) // Flask expects 'row_index'
+                    // Synchronization: Corrected payload key from row_number to row_index
+                    body: JSON.stringify({ row_index: rowNum }) 
                 });
                 
                 const data = await response.json();
@@ -603,6 +605,7 @@
             }
 
             try {
+                // Uses the updated BACKEND_URL
                 const response = await fetch(`${BACKEND_URL}/api/add`, {
                     method: 'POST',
                     headers: {
