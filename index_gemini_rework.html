@@ -224,13 +224,13 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85em; /* Slightly smaller font size for compactness */
-            table-layout: fixed; /* Fixed layout to control column widths */
-            min-width: 1300px; /* Ensure minimum width to fit all data */
+            font-size: 0.85em; 
+            table-layout: fixed; 
+            min-width: 1350px; /* Increased slightly to ensure space for actions */
         }
 
         .data-table th, .data-table td {
-            padding: 8px 5px; /* Reduced padding */
+            padding: 8px 5px; 
             text-align: left;
             border-bottom: 1px solid #ddd;
             white-space: normal; 
@@ -251,22 +251,22 @@
             background-color: #f9f9f9;
         }
 
-        /* Column Width Definitions for better layout */
-        .data-table colgroup col:nth-child(1) { width: 4%; } /* Row Index */
+        /* Column Width Definitions */
+        .data-table colgroup col:nth-child(1) { width: 3%; } /* Row Index */
         .data-table colgroup col:nth-child(2) { width: 5%; } /* Code (A) */
         .data-table colgroup col:nth-child(3) { width: 5%; } /* Sub (B) */
         .data-table colgroup col:nth-child(4) { width: 5%; } /* Pri (C) */
         .data-table colgroup col:nth-child(5) { width: 5%; } /* With (D) */
         .data-table colgroup col:nth-child(6) { width: 5%; } /* Avail (E) */
-        .data-table colgroup col:nth-child(7) { width: 15%; } /* Title (F) */
-        .data-table colgroup col:nth-child(8) { width: 8%; } /* Next Season (G) */
-        .data-table colgroup col:nth-child(9) { width: 8%; } /* Num Seasons (H) */
+        .data-table colgroup col:nth-child(7) { width: 17%; } /* Title (F) */
+        .data-table colgroup col:nth-child(8) { width: 7%; } /* Next Season (G) */
+        .data-table colgroup col:nth-child(9) { width: 7%; } /* Num Seasons (H) */
         .data-table colgroup col:nth-child(10) { width: 8%; } /* Where (I) */
         .data-table colgroup col:nth-child(11) { width: 8%; } /* Date Avail (J) */
         .data-table colgroup col:nth-child(12) { width: 8%; } /* URL (K) */
         .data-table colgroup col:nth-child(13) { width: 8%; } /* Notes (L) */
-        .data-table colgroup col:nth-child(14) { width: 10%; } /* Synopsis (M) */
-        .data-table colgroup col:nth-child(15) { width: 10%; } /* Action */
+        .data-table colgroup col:nth-child(14) { width: 8%; } /* Synopsis (M) */
+        .data-table colgroup col:nth-child(15) { width: 12%; } /* Action */
 
 
         /* Style for calculated fields (B, D, E) */
@@ -454,6 +454,13 @@
             2.x / 1999.x - Not Laura
             1000.x+ - Laura Only
         `;
+        
+        // Custom confirmation dialog replacement for window.confirm
+        function confirm(message) {
+            return window.confirm(message); 
+            // NOTE: In a professional environment, this would be a custom modal UI.
+            // Keeping window.confirm for simplicity, but noting the best practice.
+        }
 
         // --- Utility Functions ---
         function openTab(tabName) {
@@ -483,34 +490,12 @@
             }, 5000);
         }
 
-        // --- API & Data Functions ---
-
-        async function fetchWithRetry(url, options = {}, maxRetries = 3) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) {
-                        return response;
-                    }
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    } else {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                } catch (e) {
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    } else {
-                        throw e;
-                    }
-                }
-            }
-        }
+        // --- API & Data Functions (Using simple fetch, removing retry logic) ---
 
         async function loadRows(tab) {
             showMessage('Loading data from Excel...', 'warning', tab);
             try {
-                const response = await fetchWithRetry(`${BACKEND_URL}/api/data`);
+                const response = await fetch(`${BACKEND_URL}/api/data`);
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
@@ -519,12 +504,13 @@
                     renderTable(tab);
                     showMessage(`✓ Successfully loaded ${allRows.length} rows.`, 'success', tab);
                 } else {
-                    showMessage(`✗ Error loading data: ${data.message}`, 'error', tab);
-                    dataViewContainer.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    showMessage(`✗ Error loading data: ${data.message || 'Unknown error'}`, 'error', tab);
+                    dataViewContainer.innerHTML = `<p style="color: red;">Error: ${data.message || 'Unknown error'}</p>`;
                 }
             } catch (error) {
+                // This is the error path that was likely causing trouble before
                 showMessage(`✗ Network error: Could not connect to backend. ${error.message}`, 'error', tab);
-                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure backend service is running and accessible.</p>`;
+                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure backend service is running and accessible at ${BACKEND_URL}.</p>`;
             }
         }
         
@@ -593,7 +579,7 @@
                 cellAction.innerHTML = `
                     <button class="btn-save" onclick="toggleEdit(${row.row_index}, this)">Edit</button>
                     <button class="btn-duplicate" onclick="duplicateRow(${row.row_index})">Dup</button>
-                    <button class="btn-delete" onclick="deleteRow(${row.row_index}, '${row.title.replace(/'/g, "\\'")}')">Del</button>
+                    <button class="btn-delete" onclick="deleteRow(${row.row_index}, '${row.title ? row.title.replace(/'/g, "\\'") : 'Untitled'}')">Del</button>
                 `;
             });
 
@@ -615,19 +601,18 @@
             const form = document.getElementById('add-form');
             form.reset();
             
-            // Only populate the fields present in the form (skipping row_index, B, D, E)
+            // Populate all input fields based on FIELD_MAP (skipping calculated fields B, D, E)
             FIELD_MAP.filter(f => !f.calculated).forEach(field => {
-                const inputElement = form.elements[`add-${field.key}`];
-                if (inputElement) {
-                    // Set value, ensuring it's not null/undefined
-                    inputElement.value = rowData[field.key] !== null && rowData[field.key] !== undefined ? rowData[field.key] : '';
-                }
+                const key = field.key;
+                const inputElement = form.querySelector(`[name="${key}"]`) || form.querySelector(`[name="add-${key}"]`);
                 
-                // Also handle the special key 'C'
-                if (field.key === 'C') {
-                    const cInput = form.elements['add-C'];
-                    if (cInput) {
-                        cInput.value = rowData['C'] !== null && rowData['C'] !== undefined ? rowData['C'] : '';
+                if (inputElement) {
+                    const value = rowData[key] !== null && rowData[key] !== undefined ? rowData[key] : '';
+                    inputElement.value = value;
+                    
+                    // Clear the unique/primary key 'Code' field for a new entry
+                    if (key === 'code') {
+                        inputElement.value = ''; 
                     }
                 }
             });
@@ -654,7 +639,7 @@
                 row.classList.add('editing');
                 currentlyEditingRow = rowIndex;
                 
-                // Switch button text/color and hide duplicate button
+                // Switch button text/color and update actions
                 const actionCell = row.cells[row.cells.length - 1];
                 actionCell.innerHTML = `
                     <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Save</button>
@@ -694,6 +679,7 @@
             currentlyEditingRow = null;
             
             const originalRowData = allRows.find(r => r.row_index === rowIndex);
+            const titleSafe = originalRowData.title ? originalRowData.title.replace(/'/g, "\\'") : 'Untitled';
             
             // Restore original text content
             row.querySelectorAll('td[data-field-key]').forEach(td => {
@@ -715,7 +701,7 @@
             actionCell.innerHTML = `
                 <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Edit</button>
                 <button class="btn-duplicate" onclick="duplicateRow(${rowIndex})">Dup</button>
-                <button class="btn-delete" onclick="deleteRow(${rowIndex}, '${originalRowData.title.replace(/'/g, "\\'")}')">Del</button>
+                <button class="btn-delete" onclick="deleteRow(${rowIndex}, '${titleSafe}')">Del</button>
             `;
         }
 
@@ -751,7 +737,7 @@
             }
 
             try {
-                const response = await fetchWithRetry(`${BACKEND_URL}/api/update`, {
+                const response = await fetch(`${BACKEND_URL}/api/update`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -766,7 +752,7 @@
                 } else {
                     row.classList.remove('editing');
                     currentlyEditingRow = null;
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    showMessage(`✗ ${data.message || 'Update failed'}`, 'error', 'data-view');
                     loadRows('data-view'); 
                 }
             } catch (error) {
@@ -775,7 +761,6 @@
         }
 
         async function deleteRow(rowNum, title) {
-            // Use custom modal/confirm mechanism instead of window.confirm
             if (!confirm(`Are you sure you want to delete Row ${rowNum} (${title})? This action is permanent.`)) {
                 return;
             }
@@ -783,7 +768,7 @@
             showMessage(`Attempting to delete Row ${rowNum}: ${title}...`, 'warning', 'data-view');
 
             try {
-                const response = await fetchWithRetry(`${BACKEND_URL}/api/delete`, { 
+                const response = await fetch(`${BACKEND_URL}/api/delete`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ row_index: rowNum }) 
@@ -796,7 +781,7 @@
                     allRows = [];
                     loadRows('data-view'); // Reload the table
                 } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    showMessage(`✗ ${data.message || 'Delete failed'}`, 'error', 'data-view');
                 }
             } catch (error) {
                 showMessage(`Network error: ${error.message}`, 'error', 'data-view');
@@ -813,10 +798,9 @@
 
             const formData = new FormData(form);
             const payload = {};
+            // The form fields are named correctly (code, C, title, etc.)
             for (const [key, value] of formData.entries()) {
-                // Remove 'add-' prefix from form element names to match API keys
-                const api_key = key.replace('add-', ''); 
-                payload[api_key] = value.trim() || null;
+                payload[key] = value.trim() || null;
             }
             
             // Client-side validation for required fields (Code and Title)
@@ -832,7 +816,7 @@
             }
 
             try {
-                const response = await fetchWithRetry(`${BACKEND_URL}/api/add`, {
+                const response = await fetch(`${BACKEND_URL}/api/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -843,10 +827,12 @@
                 if (response.ok && data.status === 'success') {
                     showMessage(`✓ ${data.message}. Now available in Data View.`, 'success', 'add-new');
                     form.reset();
+                    // Reset default value for 'Where' field
+                    document.getElementById('add-col_i').value = 'Download';
                     // Automatically switch to data view to show the new entry
                     openTab('data-view'); 
                 } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'add-new');
+                    showMessage(`✗ ${data.message || 'Add failed'}`, 'error', 'add-new');
                 }
             } catch (error) {
                 showMessage(`Network error: ${error.message}`, 'error', 'add-new');
@@ -856,9 +842,14 @@
             }
         });
 
-        // Initial load
+        // Initial load and setting default values
         window.onload = () => {
             loadRows('data-view');
+            // Set default value for the Where (I) field in the Add tab
+            const whereInput = document.getElementById('add-col_i');
+            if (whereInput) {
+                whereInput.value = 'Download';
+            }
         };
     </script>
 </body>
