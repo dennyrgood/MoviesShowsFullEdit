@@ -40,7 +40,6 @@
             opacity: 0.9;
         }
 
-        /* --- Tab Styles --- */
         .tabs {
             display: flex;
             justify-content: center;
@@ -82,7 +81,6 @@
             display: none;
         }
         
-        /* --- Form Styles --- */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -199,7 +197,6 @@
         }
         .btn-cancel:hover { background-color: #5a6268; }
         
-        /* --- Message Styles --- */
         .message {
             padding: 15px;
             margin-bottom: 20px;
@@ -235,7 +232,6 @@
             border: 1px solid #ffeeba;
         }
 
-        /* --- Table Styles --- */
         .data-table-container {
             overflow-x: auto;
             max-height: 70vh;
@@ -259,7 +255,6 @@
             min-width: 25px;
         }
 
-        /* Style for calculated fields (B, D, E) */
         .data-table td.calculated-field {
             background-color: #f0f0ff;
             font-style: italic;
@@ -267,7 +262,6 @@
             cursor: default;
         }
 
-        /* ACTION column - first column now */
         .data-table tr > td:nth-child(1),
         .data-table tr > th:nth-child(1) {
             min-width: 60px;
@@ -277,7 +271,6 @@
             vertical-align: top;
         }
 
-        /* Row index - now second column */
         .data-table tr > td:nth-child(2),
         .data-table tr > th:nth-child(2) {
             min-width: 18px;
@@ -287,7 +280,6 @@
             font-size: 0.85em;
         }
 
-        /* Narrow columns: Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
         .data-table td[data-field-key="code"],
         .data-table td[data-field-key="B"],
         .data-table td[data-field-key="C"],
@@ -304,7 +296,6 @@
             padding: 3px 1px;
         }
 
-        /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
         .data-table td[data-field-key="title"],
         .data-table td[data-field-key="col_k"],
         .data-table td[data-field-key="col_l"],
@@ -314,7 +305,6 @@
             max-width: 150px;
         }
 
-        /* Column headers - AGGRESSIVELY SMALL */
         .data-table th {
             background-color: #f4f4f4;
             font-weight: 700;
@@ -343,18 +333,15 @@
             font-size: inherit;
         }
 
-        /* Hide less critical columns on smaller screens */
         @media (max-width: 1400px) {
-            .data-table td[data-field-key="col_j"]
-            {
+            .data-table td[data-field-key="col_j"] {
                 display: none;
             }
         }
 
         @media (max-width: 1200px) {
             .data-table td[data-field-key="col_i"],
-            .data-table td[data-field-key="col_j"]
-            {
+            .data-table td[data-field-key="col_j"] {
                 display: none;
             }
         }
@@ -386,7 +373,6 @@
             <button class="tab-button" onclick="openTab('add-new')">Add New Entry</button>
         </div>
 
-        <!-- Data View / Edit / Delete Tab -->
         <div id="data-view" class="tab-content">
             <div id="data-view-message" class="message"></div>
             <p style="margin-bottom: 15px; font-weight: bold;">Calculated fields (B, D, E) are display-only and cannot be edited. Click 'Edit' to make changes, 'Dup' to duplicate, or 'Delete' to remove a row.</p>
@@ -395,9 +381,8 @@
             </div>
         </div>
 
-        <!-- Add New Entry Tab -->
         <div id="add-new" class="tab-content hidden">
-            <h2>Add New Movie/Show (Columns A, C, F, G-M are direct input)</h2>
+            <h2>Add New Movie/Show</h2>
             <div id="add-message" class="message"></div>
             <form id="add-form">
                 <div class="form-grid">
@@ -470,156 +455,42 @@
         ];
 
         function openTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabName).classList.remove('hidden');
             document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-
-            if (tabName === 'data-view') {
-                loadRows('data-view');
-            }
+            if (tabName === 'data-view') loadRows('data-view');
         }
 
         function showMessage(text, type, tab) {
-            const msgDiv = document.getElementById(`${tab}-message`);
+            const msgDiv = document.getElementById(tab + '-message');
             msgDiv.textContent = text;
-            msgDiv.className = `message show ${type}`;
+            msgDiv.className = 'message show ' + type;
             msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            
-            setTimeout(() => {
-                msgDiv.classList.remove('show');
-            }, 5000);
+            setTimeout(() => msgDiv.classList.remove('show'), 5000);
         }
 
         async function loadRows(tab) {
             showMessage('Loading data from Excel...', 'warning', tab);
             try {
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/data`);
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
-                
+                const response = await fetch(BACKEND_URL + '/api/data');
                 const data = await response.json();
-                
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
-                    allRows = [];
-                    loadRows('data-view');
-                } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
-                }
-            } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
-            }
-        }
-
-        document.getElementById('add-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const submitBtn = form.querySelector('.btn-primary');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-
-            const formData = new FormData(form);
-            const payload = {};
-            for (const [key, value] of formData.entries()) {
-                payload[key] = value.trim();
-            }
-
-            const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
-            for (const key of requiredFields) {
-                if (!payload[key]) {
-                    const label = FIELD_MAP.find(f => f.key === key).label;
-                    showMessage(`${label} is a required field.`, 'error', 'add-new');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit New Entry';
-                    return;
-                }
-            }
-
-            try {
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/add`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
-
-                const data = await response.json();
-
-                if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}. Now available in Data View.`, 'success', 'add-new');
-                    form.reset();
-                    openTab('data-view'); 
-                } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'add-new');
-                }
-            } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'add-new');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit New Entry';
-            }
-        });
-
-        window.onload = () => {
-            loadRows('data-view');
-        };
-    </script>
-</body>
-</html> i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
-
-                const data = await response.json();
-
-                if (response.ok && data.status === 'success') {
-                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0)); 
+                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0));
                     renderTable(tab);
-                    showMessage(`✓ Successfully loaded ${allRows.length} rows.`, 'success', tab);
+                    showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
-                    showMessage(`✗ Error loading data: ${data.message}`, 'error', tab);
-                    dataViewContainer.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    showMessage('Error loading data: ' + data.message, 'error', tab);
+                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + data.message + '</p>';
                 }
             } catch (error) {
-                showMessage(`✗ Network error: Could not connect to backend at ${BACKEND_URL}. ${error.message}`, 'error', tab);
-                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure backend service is running and accessible at ${BACKEND_URL}.</p>`;
+                showMessage('Network error: Could not connect to backend. ' + error.message, 'error', tab);
+                dataViewContainer.innerHTML = '<p style="color: red;">Network Error</p>';
             }
         }
 
         function formatValue(key, value) {
             if (value === null || value === undefined || value === '') return '';
-
             if (key === 'B') {
                 const num = parseFloat(value);
                 return isNaN(num) ? value : num.toFixed(1);
@@ -628,13 +499,17 @@
                 const num = parseInt(value);
                 return isNaN(num) ? value : Math.round(num).toString();
             }
-
             return value;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
 
         function renderTable(tab) {
             if (allRows.length === 0) {
-                dataViewContainer.innerHTML = `<p>No data found or table is empty.</p>`;
+                dataViewContainer.innerHTML = '<p>No data found or table is empty.</p>';
                 return;
             }
 
@@ -642,10 +517,10 @@
             table.className = 'data-table';
             
             const thead = table.createTHead();
-            let headers = ['Action', 'Row', ...FIELD_MAP.map(f => f.label)];
-            let headerRow = thead.insertRow();
+            const headers = ['Action', 'Row'].concat(FIELD_MAP.map(f => f.label));
+            const headerRow = thead.insertRow();
             headers.forEach(text => {
-                let th = document.createElement('th');
+                const th = document.createElement('th');
                 th.textContent = text;
                 headerRow.appendChild(th);
             });
@@ -655,29 +530,19 @@
                 const tr = tbody.insertRow();
                 tr.dataset.rowIndex = row.row_index;
 
-                // Action Cell FIRST
-                let cellAction = tr.insertCell();
-                cellAction.innerHTML = `
-                    <button class="btn-save" onclick="toggleEdit(${row.row_index}, this)">Edit</button>
-                    <button class="btn-duplicate" onclick="duplicateRow(${row.row_index})">Dup</button>
-                    <button class="btn-delete" onclick="deleteRow(${row.row_index}, '${escapeHtml(row.title)}')">Delete</button>
-                `;
+                const cellAction = tr.insertCell();
+                cellAction.innerHTML = '<button class="btn-save" onclick="toggleEdit(' + row.row_index + ', this)">Edit</button>' +
+                    '<button class="btn-duplicate" onclick="duplicateRow(' + row.row_index + ')">Dup</button>' +
+                    '<button class="btn-delete" onclick="deleteRow(' + row.row_index + ', \'' + escapeHtml(row.title) + '\')">Delete</button>';
 
-                // Row Index Cell SECOND
-                let cellIndex = tr.insertCell();
+                const cellIndex = tr.insertCell();
                 cellIndex.textContent = row.row_index;
 
-                // Data Cells
                 FIELD_MAP.forEach(field => {
-                    let td = tr.insertCell();
+                    const td = tr.insertCell();
                     td.dataset.fieldKey = field.key;
-                    
-                    const rawValue = row[field.key];
-                    td.textContent = formatValue(field.key, rawValue);
-                    
-                    if (field.calculated) {
-                        td.classList.add('calculated-field');
-                    }
+                    td.textContent = formatValue(field.key, row[field.key]);
+                    if (field.calculated) td.classList.add('calculated-field');
                 });
             });
 
@@ -685,13 +550,8 @@
             dataViewContainer.appendChild(table);
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/'/g, "\\'");
-        }
-
         function toggleEdit(rowIndex, button) {
-            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            const row = document.querySelector('tr[data-row-index="' + rowIndex + '"]');
             const isEditing = row.classList.contains('editing');
 
             if (isEditing) {
@@ -699,7 +559,7 @@
                 currentlyEditingRow = null;
             } else {
                 if (currentlyEditingRow !== null) {
-                    showMessage('Please save or cancel the currently edited row before starting a new one.', 'warning', 'data-view');
+                    showMessage('Please save or cancel the currently edited row first.', 'warning', 'data-view');
                     return;
                 }
 
@@ -712,33 +572,30 @@
 
                     if (fieldInfo.calculated) {
                         td.classList.add('calculated-field');
-                        return; 
+                        return;
                     }
                     
                     const originalRowData = allRows.find(r => r.row_index === rowIndex);
-                    const originalValue = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
+                    const originalValue = originalRowData[fieldKey] || '';
 
-                    let input = document.createElement('input');
+                    const input = document.createElement('input');
                     input.type = fieldInfo.type || 'text';
                     input.value = originalValue;
                     input.className = 'edit-field';
                     input.dataset.key = fieldKey;
-                    if (fieldInfo.step) input.step = fieldInfo.step;
                     
                     td.textContent = '';
                     td.appendChild(input);
                 });
                 
                 const actionCell = row.cells[0];
-                actionCell.innerHTML = `
-                    <button class="btn-save" onclick="saveRow(${rowIndex}, this.closest('tr'))">Save</button>
-                    <button class="btn-cancel" onclick="cancelEdit(${rowIndex})">Cancel</button>
-                `;
+                actionCell.innerHTML = '<button class="btn-save" onclick="saveRow(' + rowIndex + ', this.closest(\'tr\'))">Save</button>' +
+                    '<button class="btn-cancel" onclick="cancelEdit(' + rowIndex + ')">Cancel</button>';
             }
         }
         
         function cancelEdit(rowIndex) {
-            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            const row = document.querySelector('tr[data-row-index="' + rowIndex + '"]');
             if (!row) return;
 
             row.classList.remove('editing');
@@ -749,11 +606,10 @@
             row.querySelectorAll('td[data-field-key]').forEach(td => {
                 const fieldKey = td.dataset.fieldKey;
                 const rawValue = originalRowData[fieldKey];
-                
                 td.textContent = formatValue(fieldKey, rawValue);
                 
                 const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
-                 if (fieldInfo.calculated) {
+                if (fieldInfo.calculated) {
                     td.classList.add('calculated-field');
                 } else {
                     td.classList.remove('calculated-field');
@@ -761,11 +617,9 @@
             });
 
             const actionCell = row.cells[0];
-            actionCell.innerHTML = `
-                <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Edit</button>
-                <button class="btn-duplicate" onclick="duplicateRow(${rowIndex})">Dup</button>
-                <button class="btn-delete" onclick="deleteRow(${rowIndex}, '${escapeHtml(originalRowData.title)}')">Delete</button>
-            `;
+            actionCell.innerHTML = '<button class="btn-save" onclick="toggleEdit(' + rowIndex + ', this)">Edit</button>' +
+                '<button class="btn-duplicate" onclick="duplicateRow(' + rowIndex + ')">Dup</button>' +
+                '<button class="btn-delete" onclick="deleteRow(' + rowIndex + ', \'' + escapeHtml(originalRowData.title) + '\')">Delete</button>';
         }
 
         async function saveRow(rowIndex, row) {
@@ -775,9 +629,7 @@
             let hasChanges = false;
             
             row.querySelectorAll('.edit-field').forEach(input => {
-                const key = input.dataset.key;
-                const newValue = input.value;
-                payload[key] = newValue;
+                payload[input.dataset.key] = input.value;
                 hasChanges = true;
             });
             
@@ -788,54 +640,40 @@
             }
 
             const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
-            
             for (const key of requiredFields) {
                 if (!payload[key]) {
                     const label = FIELD_MAP.find(f => f.key === key).label;
-                    showMessage(`${label} field cannot be empty.`, 'error', 'data-view');
+                    showMessage(label + ' field cannot be empty.', 'error', 'data-view');
                     return;
                 }
             }
 
             try {
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/update`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
+                const response = await fetch(BACKEND_URL + '/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
                 
                 const data = await response.json();
                 
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    showMessage(data.message, 'success', 'data-view');
                     currentlyEditingRow = null;
                     loadRows('data-view');
                 } else {
                     row.classList.remove('editing');
                     currentlyEditingRow = null;
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    showMessage(data.message, 'error', 'data-view');
                     loadRows('data-view');
                 }
             } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
             }
         }
 
         async function duplicateRow(rowIndex) {
-            showMessage(`Duplicating Row ${rowIndex}...`, 'warning', 'data-view');
+            showMessage('Duplicating Row ' + rowIndex + '...', 'warning', 'data-view');
             
             const originalRowData = allRows.find(r => r.row_index === rowIndex);
             if (!originalRowData) {
@@ -851,52 +689,98 @@
             });
 
             try {
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/add`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
+                const response = await fetch(BACKEND_URL + '/api/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    showMessage(data.message, 'success', 'data-view');
                     loadRows('data-view');
                 } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    showMessage(data.message, 'error', 'data-view');
                 }
             } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
             }
         }
 
         async function deleteRow(rowNum, title) {
-            showMessage(`Attempting to delete Row ${rowNum}: ${title}...`, 'warning', 'data-view');
+            showMessage('Attempting to delete Row ' + rowNum + ': ' + title + '...', 'warning', 'data-view');
 
             try {
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/delete`, { 
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ row_index: rowNum }) 
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2,
+                const response = await fetch(BACKEND_URL + '/api/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowNum })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showMessage(data.message, 'success', 'data-view');
+                    allRows = [];
+                    loadRows('data-view');
+                } else {
+                    showMessage(data.message, 'error', 'data-view');
+                }
+            } catch (error) {
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
+            }
+        }
+
+        document.getElementById('add-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('.btn-primary');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+            const payload = {};
+            for (const pair of formData.entries()) {
+                payload[pair[0]] = pair[1].trim();
+            }
+
+            const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
+            for (const key of requiredFields) {
+                if (!payload[key]) {
+                    const label = FIELD_MAP.find(f => f.key === key).label;
+                    showMessage(label + ' is a required field.', 'error', 'add-new');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit New Entry';
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(BACKEND_URL + '/api/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    showMessage(data.message + '. Now available in Data View.', 'success', 'add-new');
+                    form.reset();
+                    openTab('data-view');
+                } else {
+                    showMessage(data.message, 'error', 'add-new');
+                }
+            } catch (error) {
+                showMessage('Network error: ' + error.message, 'error', 'add-new');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit New Entry';
+            }
+        });
+
+        window.onload = () => loadRows('data-view');
+    </script>
+</body>
+</html>
