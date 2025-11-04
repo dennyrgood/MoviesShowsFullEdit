@@ -231,26 +231,26 @@
             cursor: default;
         }
 
-        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next Season, Num Seasons, Where, Date Avail, URL, Notes */
+        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
         .data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) */
         .data-table td[data-field-key="code"], /* A */
-        .data-table td[data-field-key="B"], /* B (Sub) -- REDUCED WIDTH */
-        .data-table td[data-field-key="C"], /* C (Pri) -- REDUCED WIDTH */
-        .data-table td[data-field-key="D"], /* D (With) -- FIXED KEY */
-        .data-table td[data-field-key="E"], /* E (Avail) -- FIXED KEY */
-        .data-table td[data-field-key="col_g"], /* G (Next Season) */
-        .data-table td[data-field-key="col_h"], /* H (Num Seasons) */
+        .data-table td[data-field-key="B"], /* B (Sub) */
+        .data-table td[data-field-key="C"], /* C (Pri) */
+        .data-table td[data-field-key="D"], /* D (With) */
+        .data-table td[data-field-key="E"], /* E (Avail) */
+        .data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow */
+        .data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow */
         .data-table td[data-field-key="col_i"], /* I (Where) */
-        .data-table td[data-field-key="col_j"], /* J (Date Avail) */
-        .data-table td[data-field-key="col_k"], /* K (URL) */
-        .data-table td[data-field-key="col_l"] /* L (Notes) */
+        .data-table td[data-field-key="col_j"] /* J (Date Avail) */
         {
             min-width: 60px; /* Smallest minimum width - Matches Row Index width */
-            white-space: nowrap; 
+            white-space: normal; 
         }
 
-        /* Flexible columns: Title (F), Synopsis (M) */
+        /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
         .data-table td[data-field-key="title"], /* F */
+        .data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE */
+        .data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE */
         .data-table td[data-field-key="col_m"] /* M (Synopsis) */
         {
             min-width: 120px; /* Give text fields a base width */
@@ -325,12 +325,12 @@
                     </div>
                     <!-- 4. Next Season (col_g) - G -->
                     <div class="form-group">
-                        <label for="add-col_g">Next Season (G)</label>
+                        <label for="add-col_g">Next (G)</label>
                         <input type="text" id="add-col_g" name="col_g">
                     </div>
                     <!-- 5. Num Seasons (col_h) - H -->
                     <div class="form-group">
-                        <label for="add-col_h">Num Seasons (H)</label>
+                        <label for="add-col_h">Num (H)</label>
                         <input type="text" id="add-col_h" name="col_h">
                     </div>
                     <!-- 6. Where (col_i) - I -->
@@ -372,7 +372,6 @@
         let currentlyEditingRow = null;
 
         // FIELD_MAP defines the order and keys, MATCHING THE EXACT JSON KEYS from the API
-        // Removed (B), (C), (D), (E) from labels
         const FIELD_MAP = [
             { key: 'code', label: 'Code', type: 'number', required: true },       // Col A (JSON key: "code")
             { key: 'B', label: 'Sub', type: 'text', calculated: true },           // Col B (JSON key: "B") - CALCULATED
@@ -380,8 +379,8 @@
             { key: 'D', label: 'With', type: 'text', calculated: true },          // Col D (JSON key: "D") - CALCULATED
             { key: 'E', label: 'Avail', type: 'text', calculated: true },         // Col E (JSON key: "E") - CALCULATED
             { key: 'title', label: 'Title', type: 'text', required: true },      // Col F (JSON key: "title")
-            { key: 'col_g', label: 'Next Season', type: 'text' },                // Col G (JSON key: "col_g")
-            { key: 'col_h', label: 'Num Seasons', type: 'text' },                // Col H (JSON key: "col_h")
+            { key: 'col_g', label: 'Next', type: 'text' },                       // Col G (JSON key: "col_g") - Label updated
+            { key: 'col_h', label: 'Num', type: 'text' },                        // Col H (JSON key: "col_h") - Label updated
             { key: 'col_i', label: 'Where', type: 'text' },                      // Col I (JSON key: "col_i")
             { key: 'col_j', label: 'Date Avail', type: 'text' },                 // Col J (JSON key: "col_j")
             { key: 'col_k', label: 'URL', type: 'text' },                        // Col K (JSON key: "col_k")
