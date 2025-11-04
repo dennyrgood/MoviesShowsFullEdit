@@ -20,7 +20,6 @@
         }
 
         .container {
-            /* Max width kept at 1200px, relying on overflow-x for the now 13 data columns */
             max-width: 1200px; 
             margin: 0 auto;
         }
@@ -41,7 +40,6 @@
             opacity: 0.9;
         }
 
-        /* --- Tab Styles --- */
         .tabs {
             display: flex;
             justify-content: center;
@@ -83,9 +81,7 @@
             display: none;
         }
         
-        /* --- Form Styles --- */
         .form-grid {
-            /* Allow three inputs per row on large screens */
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
@@ -128,7 +124,7 @@
             font-size: 1em;
             font-weight: 600;
             transition: background-color 0.3s, transform 0.1s;
-            grid-column: 1 / -1; /* Span all columns in the grid */
+            grid-column: 1 / -1;
             margin-top: 10px;
         }
 
@@ -145,11 +141,14 @@
             background-color: #dc3545;
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.75em;
             transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 2px;
         }
         .btn-delete:hover { background-color: #c82333; }
 
@@ -157,16 +156,47 @@
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.75em;
             transition: background-color 0.3s;
-            margin-right: 5px;
+            display: block;
+            width: 100%;
+            margin-bottom: 2px;
         }
         .btn-save:hover { background-color: #1e7e34; }
+
+        .btn-duplicate {
+            background-color: #ffc107;
+            color: #333;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75em;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .btn-duplicate:hover { background-color: #e0a800; }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75em;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .btn-cancel:hover { background-color: #5a6268; }
         
-        /* --- Message Styles --- */
         .message {
             padding: 15px;
             margin-bottom: 20px;
@@ -202,61 +232,77 @@
             border: 1px solid #ffeeba;
         }
 
-        /* --- Table Styles --- */
         .data-table-container {
             overflow-x: auto;
-            max-height: 70vh; /* Limit height for long tables */
+            max-height: 70vh;
         }
      
-        /* old data table:
-        
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9em;
-            table-layout: auto; 
+            font-size: 0.65em;
+            table-layout: auto;
+            line-height: 1.1;
         }
 
         .data-table th, .data-table td {
-            padding: 12px 10px; /* Reduced padding slightly for more columns 
+            padding: 3px 2px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
-            white-space: normal; 
-            min-width: 80px; /* Base min-width */
+            border-bottom: 1px solid #e0e0e0;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            min-width: 25px;
         }
 
-        /* Style for calculated fields (B, D, E) 
         .data-table td.calculated-field {
-            background-color: #f0f0ff; /* Light blue/lavender background 
+            background-color: #f0f0ff;
             font-style: italic;
             color: #555;
             cursor: default;
         }
 
-        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail 
-        .data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) 
-        .data-table td[data-field-key="code"], /* A 
-        .data-table td[data-field-key="B"], /* B (Sub) 
-        .data-table td[data-field-key="C"], /* C (Pri) 
-        .data-table td[data-field-key="D"], /* D (With) 
-        .data-table td[data-field-key="E"], /* E (Avail) 
-        .data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow 
-        .data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow 
-        .data-table td[data-field-key="col_i"], /* I (Where) 
-        .data-table td[data-field-key="col_j"] /* J (Date Avail) 
-        {
-            min-width: 30px; /* Smallest minimum width - Matches Row Index width 
-            white-space: normal; 
+        .data-table tr > td:nth-child(1),
+        .data-table tr > th:nth-child(1) {
+            min-width: 60px;
+            max-width: 70px;
+            padding: 3px 2px;
+            text-align: center;
+            vertical-align: top;
         }
 
-        /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) 
-        .data-table td[data-field-key="title"], /* F 
-        .data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE
-        .data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE 
-        .data-table td[data-field-key="col_m"] /* M (Synopsis) 
+        .data-table tr > td:nth-child(2),
+        .data-table tr > th:nth-child(2) {
+            min-width: 18px;
+            max-width: 25px;
+            padding: 3px 1px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .data-table td[data-field-key="code"],
+        .data-table td[data-field-key="B"],
+        .data-table td[data-field-key="C"],
+        .data-table td[data-field-key="D"],
+        .data-table td[data-field-key="E"],
+        .data-table td[data-field-key="col_g"],
+        .data-table td[data-field-key="col_h"],
+        .data-table td[data-field-key="col_i"],
+        .data-table td[data-field-key="col_j"]
         {
-            min-width: 100px; /* Give text fields a base width 
-            white-space: normal;
+            min-width: 22px;
+            max-width: 60px;
+            font-size: 0.95em;
+            padding: 3px 1px;
+        }
+
+        .data-table td[data-field-key="title"],
+        .data-table td[data-field-key="col_k"],
+        .data-table td[data-field-key="col_l"],
+        .data-table td[data-field-key="col_m"]
+        {
+            min-width: 60px;
+            max-width: 150px;
         }
 
         .data-table th {
@@ -266,212 +312,53 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            font-size: 0.75em;
+            padding: 3px 2px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
         }
 
-        */
-        
-/* new data table - claude
-        
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9em;
-    table-layout: auto;
-}
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
 
-.data-table th, .data-table td {
-    padding: 8px 6px; /* Reduced padding for more space 
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    white-space: normal;
-    word-break: break-word; /* Break long unbroken strings 
-    overflow-wrap: break-word; /* Fallback for older browsers 
-    min-width: 40px; /* Reduced base min-width 
-}
+        .data-table td input[type="text"], 
+        .data-table td input[type="number"],
+        .data-table td select {
+            padding: 2px 2px;
+            border: 1px solid #ddd;
+            width: 100%;
+            min-width: 35px;
+            box-sizing: border-box;
+            font-size: inherit;
+        }
 
-/* Style for calculated fields (B, D, E) 
-.data-table td.calculated-field {
-    background-color: #f0f0ff; /* Light blue/lavender background 
-    font-style: italic;
-    color: #555;
-    cursor: default;
-}
+        @media (max-width: 1400px) {
+            .data-table td[data-field-key="col_j"] {
+                display: none;
+            }
+        }
 
-/* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail 
-.data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) 
-.data-table td[data-field-key="code"], /* A 
-.data-table td[data-field-key="B"], /* B (Sub) 
-.data-table td[data-field-key="C"], /* C (Pri) 
-.data-table td[data-field-key="D"], /* D (With) 
-.data-table td[data-field-key="E"], /* E (Avail) 
-.data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow
-.data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow 
-.data-table td[data-field-key="col_i"], /* I (Where)
-.data-table td[data-field-key="col_j"] /* J (Date Avail)/
-{
-    min-width: 30px; /* Smallest minimum width 
-    max-width: 80px; /* Prevent these from expanding too much 
-}
+        @media (max-width: 1200px) {
+            .data-table td[data-field-key="col_i"],
+            .data-table td[data-field-key="col_j"] {
+                display: none;
+            }
+        }
 
-/* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) 
-.data-table td[data-field-key="title"], /* F 
-.data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE 
-.data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE 
-.data-table td[data-field-key="col_m"] /* M (Synopsis) 
-{
-    min-width: 80px; /* Reduced base width 
-    max-width: 200px; /* Limit maximum width 
-}
-
-.data-table th {
-    background-color: #f4f4f4;
-    font-weight: 700;
-    text-transform: uppercase;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.data-table tr:hover {
-    background-color: #f9f9f9;
-}
-
-.data-table td input[type="text"], 
-.data-table td input[type="number"],
-.data-table td select {
-    padding: 5px;
-    border: 1px solid #ddd;
-    width: 100%;
-    min-width: 60px; /* Reduced from 80px */
-
-/* new new claude */
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.65em; /* Much smaller base font */
-    table-layout: auto;
-    line-height: 1.1; /* Very tight line spacing */
-}
-
-.data-table th, .data-table td {
-    padding: 3px 2px; /* Minimal padding */
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    min-width: 25px; /* Minimal base width */
-}
-
-/* Style for calculated fields (B, D, E) */
-.data-table td.calculated-field {
-    background-color: #f0f0ff;
-    font-style: italic;
-    color: #555;
-    cursor: default;
-}
-
-/* Row index - ultra compact */
-.data-table tr > td:nth-child(1) {
-    min-width: 18px;
-    max-width: 25px;
-    padding: 3px 1px;
-    text-align: center;
-    font-size: 0.85em;
-}
-
-/* Narrow columns: Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
-.data-table td[data-field-key="code"], /* A */
-.data-table td[data-field-key="B"], /* B (Sub) */
-.data-table td[data-field-key="C"], /* C (Pri) */
-.data-table td[data-field-key="D"], /* D (With) */
-.data-table td[data-field-key="E"], /* E (Avail) */
-.data-table td[data-field-key="col_g"], /* G (Next) */
-.data-table td[data-field-key="col_h"], /* H (Num) */
-.data-table td[data-field-key="col_i"], /* I (Where) */
-.data-table td[data-field-key="col_j"] /* J (Date Avail) */
-{
-    min-width: 22px; /* Ultra narrow */
-    max-width: 60px; /* Very tight constraint */
-    font-size: 0.95em;
-    padding: 3px 1px; /* Minimal padding */
-}
-
-/* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
-.data-table td[data-field-key="title"], /* F */
-.data-table td[data-field-key="col_k"], /* K (URL) */
-.data-table td[data-field-key="col_l"], /* L (Notes) */
-.data-table td[data-field-key="col_m"] /* M (Synopsis) */
-{
-    min-width: 60px; /* Minimal for text fields */
-    max-width: 150px; /* Tight constraint */
-}
-
-/* Column headers - AGGRESSIVELY SMALL */
-.data-table th {
-    background-color: #f4f4f4;
-    font-weight: 700;
-    text-transform: uppercase;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    font-size: 0.75em; /* Much smaller headers */
-    padding: 3px 2px; /* Minimal padding */
-    line-height: 1.1; /* Tight line height */
-    letter-spacing: -0.02em; /* Slightly tighter letter spacing */
-}
-
-.data-table tr:hover {
-    background-color: #f9f9f9;
-}
-
-.data-table td input[type="text"], 
-.data-table td input[type="number"],
-.data-table td select {
-    padding: 2px 2px; /* Minimal input padding */
-    border: 1px solid #ddd;
-    width: 100%;
-    min-width: 35px; /* Very narrow inputs */
-    box-sizing: border-box;
-    font-size: inherit;
-}
-
-/* Make buttons more compact */
-.data-table td button {
-    padding: 2px 5px; /* Minimal button padding */
-    font-size: 0.85em;
-    margin: 1px;
-}
-
-/* Hide less critical columns on smaller screens */
-@media (max-width: 1400px) {
-    .data-table td[data-field-key="col_j"] /* Date Avail */
-    {
-        display: none;
-    }
-}
-
-@media (max-width: 1200px) {
-    .data-table td[data-field-key="col_i"], /* Where */
-    .data-table td[data-field-key="col_j"] /* Date Avail */
-    {
-        display: none;
-    }
-}
-
-@media (max-width: 1000px) {
-    .data-table {
-        font-size: 0.6em; /* Extremely small on small screens */
-    }
-    
-    .data-table th, .data-table td {
-        padding: 2px 1px; /* Ultra compact */
-    }
-    
-    .data-table th {
-        font-size: 0.7em;
-    }
-}
+        @media (max-width: 1000px) {
+            .data-table {
+                font-size: 0.6em;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 2px 1px;
+            }
+            
+            .data-table th {
+                font-size: 0.7em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -486,72 +373,59 @@
             <button class="tab-button" onclick="openTab('add-new')">Add New Entry</button>
         </div>
 
-        <!-- Data View / Edit / Delete Tab -->
         <div id="data-view" class="tab-content">
             <div id="data-view-message" class="message"></div>
-            <p style="margin-bottom: 15px; font-weight: bold;">Calculated fields (B, D, E) are display-only and cannot be edited. Click 'Edit' to make changes, or 'Delete' to remove a row.</p>
+            <p style="margin-bottom: 15px; font-weight: bold;">Calculated fields (B, D, E) are display-only and cannot be edited. Click 'Edit' to make changes, 'Dup' to duplicate, or 'Delete' to remove a row.</p>
             <div id="data-table-container" class="data-table-container">
                 <p>Loading data...</p>
             </div>
         </div>
 
-        <!-- Add New Entry Tab (Now includes only required input fields) -->
         <div id="add-new" class="tab-content hidden">
-            <h2>Add New Movie/Show (Columns A, C, F, G-M are direct input)</h2>
+            <h2>Add New Movie/Show</h2>
             <div id="add-message" class="message"></div>
             <form id="add-form">
                 <div class="form-grid">
-                    <!-- 1. Code (code) - A -->
                     <div class="form-group">
                         <label for="add-code">Code (A)</label>
                         <input type="number" id="add-code" name="code" required>
                     </div>
-                    <!-- 2. Pri (C) - C (Input field name fixed to "C") -->
                     <div class="form-group">
                         <label for="add-C">Pri (C)</label>
                         <input type="text" id="add-C" name="C">
                     </div>
-                    <!-- 3. Title (title) - F -->
                     <div class="form-group">
                         <label for="add-title">Title (F)</label>
                         <input type="text" id="add-title" name="title" required>
                     </div>
-                    <!-- 4. Next Season (col_g) - G -->
                     <div class="form-group">
                         <label for="add-col_g">Next (G)</label>
                         <input type="text" id="add-col_g" name="col_g">
                     </div>
-                    <!-- 5. Num Seasons (col_h) - H -->
                     <div class="form-group">
                         <label for="add-col_h">Num (H)</label>
                         <input type="text" id="add-col_h" name="col_h">
                     </div>
-                    <!-- 6. Where (col_i) - I -->
                     <div class="form-group">
                         <label for="add-col_i">Where (I)</label>
                         <input type="text" id="add-col_i" name="col_i">
                     </div>
-                    <!-- 7. Date Avail (col_j) - J -->
                     <div class="form-group">
                         <label for="add-col_j">Date Avail (J)</label>
                         <input type="text" id="add-col_j" name="col_j">
                     </div>
-                    <!-- 8. URL (col_k) - K -->
                     <div class="form-group">
                         <label for="add-col_k">URL (K)</label>
                         <input type="text" id="add-col_k" name="col_k">
                     </div>
-                    <!-- 9. Notes (col_l) - L -->
                     <div class="form-group">
                         <label for="add-col_l">Notes (L)</label>
                         <input type="text" id="add-col_l" name="col_l">
                     </div>
-                    <!-- 10. Synopsis (col_m) - M -->
                     <div class="form-group">
                         <label for="add-col_m">Synopsis (M)</label>
                         <input type="text" id="add-col_m" name="col_m">
                     </div>
-                    <!-- B, D, E fields are omitted as they are calculated -->
                 </div>
                 <button type="submit" class="btn-primary">Submit New Entry</button>
             </form>
@@ -564,156 +438,112 @@
         let allRows = [];
         let currentlyEditingRow = null;
 
-        // FIELD_MAP defines the order and keys, MATCHING THE EXACT JSON KEYS from the API
         const FIELD_MAP = [
-            { key: 'code', label: 'Code', type: 'number', required: true },       // Col A (JSON key: "code")
-            { key: 'B', label: 'Sub', type: 'text', calculated: true },           // Col B (JSON key: "B") - CALCULATED
-            { key: 'C', label: 'Pri', type: 'text' },                            // Col C (JSON key: "C") - INPUT FIELD
-            { key: 'D', label: 'With', type: 'text', calculated: true },          // Col D (JSON key: "D") - CALCULATED
-            { key: 'E', label: 'Avail', type: 'text', calculated: true },         // Col E (JSON key: "E") - CALCULATED
-            { key: 'title', label: 'Title', type: 'text', required: true },      // Col F (JSON key: "title")
-            { key: 'col_g', label: 'Next', type: 'text' },                       // Col G (JSON key: "col_g") - Label updated
-            { key: 'col_h', label: 'Num', type: 'text' },                        // Col H (JSON key: "col_h") - Label updated
-            { key: 'col_i', label: 'Where', type: 'text' },                      // Col I (JSON key: "col_i")
-            { key: 'col_j', label: 'Date Avail', type: 'text' },                 // Col J (JSON key: "col_j")
-            { key: 'col_k', label: 'URL', type: 'text' },                        // Col K (JSON key: "col_k")
-            { key: 'col_l', label: 'Notes', type: 'text' },                      // Col L (JSON key: "col_l")
-            { key: 'col_m', label: 'Synopsis', type: 'text' }                    // Col M (JSON key: "col_m")
+            { key: 'code', label: 'Code', type: 'number', required: true },
+            { key: 'B', label: 'Sub', type: 'text', calculated: true },
+            { key: 'C', label: 'Pri', type: 'text' },
+            { key: 'D', label: 'With', type: 'text', calculated: true },
+            { key: 'E', label: 'Avail', type: 'text', calculated: true },
+            { key: 'title', label: 'Title', type: 'text', required: true },
+            { key: 'col_g', label: 'Next', type: 'text' },
+            { key: 'col_h', label: 'Num', type: 'text' },
+            { key: 'col_i', label: 'Where', type: 'text' },
+            { key: 'col_j', label: 'Date Avail', type: 'text' },
+            { key: 'col_k', label: 'URL', type: 'text' },
+            { key: 'col_l', label: 'Notes', type: 'text' },
+            { key: 'col_m', label: 'Synopsis', type: 'text' }
         ];
 
-        // --- Utility Functions ---
         function openTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabName).classList.remove('hidden');
             document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-
-            if (tabName === 'data-view') {
-                loadRows('data-view');
-            }
+            if (tabName === 'data-view') loadRows('data-view');
         }
 
         function showMessage(text, type, tab) {
-            const msgDiv = document.getElementById(`${tab}-message`);
+            const msgDiv = document.getElementById(tab + '-message');
             msgDiv.textContent = text;
-            msgDiv.className = `message show ${type}`;
+            msgDiv.className = 'message show ' + type;
             msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            
-            setTimeout(() => {
-                msgDiv.classList.remove('show');
-            }, 5000);
+            setTimeout(() => msgDiv.classList.remove('show'), 5000);
         }
-
-        // --- API & Data Functions ---
 
         async function loadRows(tab) {
             showMessage('Loading data from Excel...', 'warning', tab);
             try {
-                // Using exponential backoff for fetch call
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/data`);
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
-
+                const response = await fetch(BACKEND_URL + '/api/data');
                 const data = await response.json();
-
                 if (response.ok && data.status === 'success') {
-                    // Sort by code descending
-                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0)); 
+                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0));
                     renderTable(tab);
-                    showMessage(`✓ Successfully loaded ${allRows.length} rows.`, 'success', tab);
+                    showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
-                    showMessage(`✗ Error loading data: ${data.message}`, 'error', tab);
-                    dataViewContainer.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    showMessage('Error loading data: ' + data.message, 'error', tab);
+                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + data.message + '</p>';
                 }
             } catch (error) {
-                showMessage(`✗ Network error: Could not connect to backend at ${BACKEND_URL}. ${error.message}`, 'error', tab);
-                dataViewContainer.innerHTML = `<p style="color: red;">Network Error: Ensure backend service is running and accessible at ${BACKEND_URL}.</p>`;
+                showMessage('Network error: Could not connect to backend. ' + error.message, 'error', tab);
+                dataViewContainer.innerHTML = '<p style="color: red;">Network Error</p>';
             }
         }
-        
-        // --- Table Rendering and Interaction ---
 
         function formatValue(key, value) {
             if (value === null || value === undefined || value === '') return '';
-
-            // Handle number formatting as requested
-            if (key === 'B') { // Sub(B) -> #.# format
+            if (key === 'B') {
                 const num = parseFloat(value);
                 return isNaN(num) ? value : num.toFixed(1);
             }
-            if (key === 'C') { // Pri(C) -> # format
+            if (key === 'C') {
                 const num = parseInt(value);
                 return isNaN(num) ? value : Math.round(num).toString();
             }
-
             return value;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
 
         function renderTable(tab) {
             if (allRows.length === 0) {
-                dataViewContainer.innerHTML = `<p>No data found or table is empty.</p>`;
+                dataViewContainer.innerHTML = '<p>No data found or table is empty.</p>';
                 return;
             }
 
             const table = document.createElement('table');
             table.className = 'data-table';
             
-            // Generate headers
             const thead = table.createTHead();
-            let headers = ['Row', ...FIELD_MAP.map(f => f.label), 'Action'];
-            let headerRow = thead.insertRow();
+            const headers = ['Action', 'Row'].concat(FIELD_MAP.map(f => f.label));
+            const headerRow = thead.insertRow();
             headers.forEach(text => {
-                let th = document.createElement('th');
+                const th = document.createElement('th');
                 th.textContent = text;
                 headerRow.appendChild(th);
             });
 
-            // Generate body
             const tbody = table.createTBody();
             allRows.forEach(row => {
                 const tr = tbody.insertRow();
                 tr.dataset.rowIndex = row.row_index;
 
-                // Row Index Cell
-                let cellIndex = tr.insertCell();
+                const cellAction = tr.insertCell();
+                cellAction.innerHTML = '<button class="btn-save" onclick="toggleEdit(' + row.row_index + ', this)">Edit</button>' +
+                    '<button class="btn-duplicate" onclick="duplicateRow(' + row.row_index + ')">Dup</button>' +
+                    '<button class="btn-delete" onclick="deleteRow(' + row.row_index + ', \'' + escapeHtml(row.title) + '\')">Delete</button>';
+
+                const cellIndex = tr.insertCell();
                 cellIndex.textContent = row.row_index;
 
-                // Data Cells (rendered according to the KEY order in FIELD_MAP)
                 FIELD_MAP.forEach(field => {
-                    let td = tr.insertCell();
+                    const td = tr.insertCell();
                     td.dataset.fieldKey = field.key;
-                    
-                    // Apply formatting before setting text content
-                    const rawValue = row[field.key];
-                    td.textContent = formatValue(field.key, rawValue);
-                    
-                    if (field.calculated) {
-                        td.classList.add('calculated-field');
-                    }
+                    td.textContent = formatValue(field.key, row[field.key]);
+                    if (field.calculated) td.classList.add('calculated-field');
                 });
-
-                // Action Cell
-                let cellAction = tr.insertCell();
-                cellAction.innerHTML = `
-                    <button class="btn-save" onclick="toggleEdit(${row.row_index}, this)">Edit</button>
-                    <button class="btn-delete" onclick="deleteRow(${row.row_index}, '${row.title}')">Delete</button>
-                `;
             });
 
             dataViewContainer.innerHTML = '';
@@ -721,7 +551,7 @@
         }
 
         function toggleEdit(rowIndex, button) {
-            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            const row = document.querySelector('tr[data-row-index="' + rowIndex + '"]');
             const isEditing = row.classList.contains('editing');
 
             if (isEditing) {
@@ -729,56 +559,43 @@
                 currentlyEditingRow = null;
             } else {
                 if (currentlyEditingRow !== null) {
-                    showMessage('Please save or cancel the currently edited row before starting a new one.', 'warning', 'data-view');
+                    showMessage('Please save or cancel the currently edited row first.', 'warning', 'data-view');
                     return;
                 }
 
                 row.classList.add('editing');
                 currentlyEditingRow = rowIndex;
-                
-                // Switch button text/color
-                button.textContent = 'Save';
-                button.style.backgroundColor = '#17a2b8'; // Info blue for Save
 
-                // Convert data cells to input fields
                 row.querySelectorAll('td[data-field-key]').forEach(td => {
                     const fieldKey = td.dataset.fieldKey;
                     const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
 
-                    // Skip conversion for calculated fields (B, D, E)
                     if (fieldInfo.calculated) {
-                        // Keep cell as text, only add the visual cue
                         td.classList.add('calculated-field');
-                        return; 
+                        return;
                     }
                     
-                    // Retrieve original value from allRows data structure for editing
                     const originalRowData = allRows.find(r => r.row_index === rowIndex);
-                    const originalValue = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
+                    const originalValue = originalRowData[fieldKey] || '';
 
-
-                    let input = document.createElement('input');
+                    const input = document.createElement('input');
                     input.type = fieldInfo.type || 'text';
-                    input.value = originalValue; // Set input value to the raw original data
+                    input.value = originalValue;
                     input.className = 'edit-field';
                     input.dataset.key = fieldKey;
-                    if (fieldInfo.step) input.step = fieldInfo.step;
                     
                     td.textContent = '';
                     td.appendChild(input);
                 });
                 
-                // Add Cancel button
-                const actionCell = row.cells[row.cells.length - 1];
-                actionCell.innerHTML = `
-                    <button class="btn-save" onclick="saveRow(${rowIndex}, row)">Save</button>
-                    <button class="btn-delete" onclick="cancelEdit(${rowIndex})">Cancel</button>
-                `;
+                const actionCell = row.cells[0];
+                actionCell.innerHTML = '<button class="btn-save" onclick="saveRow(' + rowIndex + ', this.closest(\'tr\'))">Save</button>' +
+                    '<button class="btn-cancel" onclick="cancelEdit(' + rowIndex + ')">Cancel</button>';
             }
         }
         
         function cancelEdit(rowIndex) {
-            const row = document.querySelector(`tr[data-row-index="${rowIndex}"]`);
+            const row = document.querySelector('tr[data-row-index="' + rowIndex + '"]');
             if (!row) return;
 
             row.classList.remove('editing');
@@ -786,29 +603,23 @@
             
             const originalRowData = allRows.find(r => r.row_index === rowIndex);
             
-            // Restore original text content (formatted)
             row.querySelectorAll('td[data-field-key]').forEach(td => {
                 const fieldKey = td.dataset.fieldKey;
                 const rawValue = originalRowData[fieldKey];
-                
-                // Apply formatting before setting text content
                 td.textContent = formatValue(fieldKey, rawValue);
                 
-                // Restore calculated-field class if necessary
                 const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
-                 if (fieldInfo.calculated) {
+                if (fieldInfo.calculated) {
                     td.classList.add('calculated-field');
                 } else {
                     td.classList.remove('calculated-field');
                 }
             });
 
-            // Restore action buttons
-            const actionCell = row.cells[row.cells.length - 1];
-            actionCell.innerHTML = `
-                <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Edit</button>
-                <button class="btn-delete" onclick="deleteRow(${rowIndex}, '${originalRowData.title}')">Delete</button>
-            `;
+            const actionCell = row.cells[0];
+            actionCell.innerHTML = '<button class="btn-save" onclick="toggleEdit(' + rowIndex + ', this)">Edit</button>' +
+                '<button class="btn-duplicate" onclick="duplicateRow(' + rowIndex + ')">Dup</button>' +
+                '<button class="btn-delete" onclick="deleteRow(' + rowIndex + ', \'' + escapeHtml(originalRowData.title) + '\')">Delete</button>';
         }
 
         async function saveRow(rowIndex, row) {
@@ -817,11 +628,8 @@
             const payload = { row_index: rowIndex };
             let hasChanges = false;
             
-            // Collect data ONLY from input fields (skips calculated fields B, D, E)
             row.querySelectorAll('.edit-field').forEach(input => {
-                const key = input.dataset.key;
-                const newValue = input.value;
-                payload[key] = newValue;
+                payload[input.dataset.key] = input.value;
                 hasChanges = true;
             });
             
@@ -831,95 +639,109 @@
                 return;
             }
 
-            // Client-side validation for required fields (Code and Title)
             const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
-            
             for (const key of requiredFields) {
                 if (!payload[key]) {
                     const label = FIELD_MAP.find(f => f.key === key).label;
-                    showMessage(`${label} field cannot be empty.`, 'error', 'data-view');
+                    showMessage(label + ' field cannot be empty.', 'error', 'data-view');
                     return;
                 }
             }
 
             try {
-                // Using exponential backoff for fetch call
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/update`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
+                const response = await fetch(BACKEND_URL + '/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
                 
                 const data = await response.json();
                 
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    showMessage(data.message, 'success', 'data-view');
                     currentlyEditingRow = null;
-                    loadRows('data-view'); // Reload data to show changes and updated formulas
+                    loadRows('data-view');
                 } else {
-                    // Revert edit state on failure
                     row.classList.remove('editing');
                     currentlyEditingRow = null;
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
-                    loadRows('data-view'); // Reload original data
+                    showMessage(data.message, 'error', 'data-view');
+                    loadRows('data-view');
                 }
             } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
+            }
+        }
+
+        async function duplicateRow(rowIndex) {
+            showMessage('Duplicating Row ' + rowIndex + '...', 'warning', 'data-view');
+            
+            const originalRowData = allRows.find(r => r.row_index === rowIndex);
+            if (!originalRowData) {
+                showMessage('Error: Could not find row data to duplicate.', 'error', 'data-view');
+                return;
+            }
+
+            const payload = {};
+
+            /*
+            FIELD_MAP.forEach(field => {
+                if (!field.calculated && originalRowData[field.key] !== undefined) {
+                    payload[field.key] = originalRowData[field.key];
+                }
+            });
+            */
+            
+            FIELD_MAP.forEach(field => {
+                if (!field.calculated && originalRowData[field.key] !== undefined) {
+                    const value = originalRowData[field.key];
+                    payload[field.key] = value !== null && value !== undefined ? String(value).trim() : '';
+                }
+            });
+            
+            try {
+                const response = await fetch(BACKEND_URL + '/api/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    showMessage(data.message, 'success', 'data-view');
+                    loadRows('data-view');
+                } else {
+                    showMessage(data.message, 'error', 'data-view');
+                }
+            } catch (error) {
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
             }
         }
 
         async function deleteRow(rowNum, title) {
-            showMessage(`Attempting to delete Row ${rowNum}: ${title}...`, 'warning', 'data-view');
+            showMessage('Attempting to delete Row ' + rowNum + ': ' + title + '...', 'warning', 'data-view');
 
             try {
-                // Using exponential backoff for fetch call
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/delete`, { 
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ row_index: rowNum }) 
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
+                const response = await fetch(BACKEND_URL + '/api/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowNum })
+                });
                 
                 const data = await response.json();
                 
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}`, 'success', 'data-view');
+                    showMessage(data.message, 'success', 'data-view');
                     allRows = [];
-                    loadRows('data-view'); // Reload the table
+                    loadRows('data-view');
                 } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'data-view');
+                    showMessage(data.message, 'error', 'data-view');
                 }
             } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'data-view');
+                showMessage('Network error: ' + error.message, 'error', 'data-view');
             }
         }
 
-        // --- Add New Entry Logic ---
         document.getElementById('add-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
@@ -927,20 +749,17 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
 
-            // Collect data
             const formData = new FormData(form);
             const payload = {};
-            for (const [key, value] of formData.entries()) {
-                payload[key] = value.trim();
+            for (const pair of formData.entries()) {
+                payload[pair[0]] = pair[1].trim();
             }
 
-            // Client-side validation
-            // Note: Required fields are 'code' and 'title' based on FIELD_MAP definition
             const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
             for (const key of requiredFields) {
                 if (!payload[key]) {
                     const label = FIELD_MAP.find(f => f.key === key).label;
-                    showMessage(`${label} is a required field.`, 'error', 'add-new');
+                    showMessage(label + ' is a required field.', 'error', 'add-new');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Submit New Entry';
                     return;
@@ -948,48 +767,30 @@
             }
 
             try {
-                // Using exponential backoff for fetch call
-                const maxRetries = 3;
-                let response = null;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        response = await fetch(`${BACKEND_URL}/api/add`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                        } else {
-                            throw e;
-                        }
-                    }
-                }
+                const response = await fetch(BACKEND_URL + '/api/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    showMessage(`✓ ${data.message}. Now available in Data View.`, 'success', 'add-new');
+                    showMessage(data.message + '. Now available in Data View.', 'success', 'add-new');
                     form.reset();
-                    // Automatically switch to data view to show the new entry
-                    openTab('data-view'); 
+                    openTab('data-view');
                 } else {
-                    showMessage(`✗ ${data.message}`, 'error', 'add-new');
+                    showMessage(data.message, 'error', 'add-new');
                 }
             } catch (error) {
-                showMessage(`Network error: ${error.message}`, 'error', 'add-new');
+                showMessage('Network error: ' + error.message, 'error', 'add-new');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit New Entry';
             }
         });
 
-        // Initial load
-        window.onload = () => {
-            loadRows('data-view');
-        };
+        window.onload = () => loadRows('data-view');
     </script>
 </body>
 </html>
