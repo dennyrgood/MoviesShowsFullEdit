@@ -345,23 +345,22 @@
     min-width: 60px; /* Reduced from 80px */
 
 /* new new claude */
-        
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.7em; /* Further reduced from 0.8em */
+    font-size: 0.65em; /* Much smaller base font */
     table-layout: auto;
-    line-height: 1.2; /* Even tighter line spacing */
+    line-height: 1.1; /* Very tight line spacing */
 }
 
 .data-table th, .data-table td {
-    padding: 4px 3px; /* Further reduced padding */
+    padding: 3px 2px; /* Minimal padding */
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
     white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
-    min-width: 30px; /* Further reduced base min-width */
+    min-width: 25px; /* Minimal base width */
 }
 
 /* Style for calculated fields (B, D, E) */
@@ -372,13 +371,13 @@
     cursor: default;
 }
 
-/* Row index - super compact */
+/* Row index - ultra compact */
 .data-table tr > td:nth-child(1) {
-    min-width: 20px;
-    max-width: 30px;
-    padding: 4px 2px;
+    min-width: 18px;
+    max-width: 25px;
+    padding: 3px 1px;
     text-align: center;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 /* Narrow columns: Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
@@ -392,10 +391,10 @@
 .data-table td[data-field-key="col_i"], /* I (Where) */
 .data-table td[data-field-key="col_j"] /* J (Date Avail) */
 {
-    min-width: 25px; /* Further reduced */
-    max-width: 70px; /* Tighter constraint */
+    min-width: 22px; /* Ultra narrow */
+    max-width: 60px; /* Very tight constraint */
     font-size: 0.95em;
-    padding: 4px 2px; /* Tighter padding for narrow columns */
+    padding: 3px 1px; /* Minimal padding */
 }
 
 /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
@@ -404,10 +403,11 @@
 .data-table td[data-field-key="col_l"], /* L (Notes) */
 .data-table td[data-field-key="col_m"] /* M (Synopsis) */
 {
-    min-width: 70px; /* Further reduced */
-    max-width: 180px; /* Tighter constraint */
+    min-width: 60px; /* Minimal for text fields */
+    max-width: 150px; /* Tight constraint */
 }
 
+/* Column headers - AGGRESSIVELY SMALL */
 .data-table th {
     background-color: #f4f4f4;
     font-weight: 700;
@@ -415,8 +415,10 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    font-size: 0.85em; /* Smaller headers */
-    padding: 5px 3px; /* Slightly more padding than cells for readability */
+    font-size: 0.75em; /* Much smaller headers */
+    padding: 3px 2px; /* Minimal padding */
+    line-height: 1.1; /* Tight line height */
+    letter-spacing: -0.02em; /* Slightly tighter letter spacing */
 }
 
 .data-table tr:hover {
@@ -426,18 +428,18 @@
 .data-table td input[type="text"], 
 .data-table td input[type="number"],
 .data-table td select {
-    padding: 2px 3px; /* More compact inputs */
+    padding: 2px 2px; /* Minimal input padding */
     border: 1px solid #ddd;
     width: 100%;
-    min-width: 40px; /* Further reduced */
+    min-width: 35px; /* Very narrow inputs */
     box-sizing: border-box;
     font-size: inherit;
 }
 
 /* Make buttons more compact */
 .data-table td button {
-    padding: 3px 6px;
-    font-size: 0.9em;
+    padding: 2px 5px; /* Minimal button padding */
+    font-size: 0.85em;
     margin: 1px;
 }
 
@@ -459,11 +461,15 @@
 
 @media (max-width: 1000px) {
     .data-table {
-        font-size: 0.65em; /* Even smaller on small screens */
+        font-size: 0.6em; /* Extremely small on small screens */
     }
     
     .data-table th, .data-table td {
-        padding: 3px 2px; /* Extra compact */
+        padding: 2px 1px; /* Ultra compact */
+    }
+    
+    .data-table th {
+        font-size: 0.7em;
     }
 }
     </style>
