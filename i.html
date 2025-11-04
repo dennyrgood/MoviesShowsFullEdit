@@ -682,12 +682,22 @@
             }
 
             const payload = {};
+
+            /*
             FIELD_MAP.forEach(field => {
                 if (!field.calculated && originalRowData[field.key] !== undefined) {
                     payload[field.key] = originalRowData[field.key];
                 }
             });
-
+            */
+            
+            FIELD_MAP.forEach(field => {
+                if (!field.calculated && originalRowData[field.key] !== undefined) {
+                    const value = originalRowData[field.key];
+                    payload[field.key] = value !== null && value !== undefined ? String(value).trim() : '';
+                }
+            });
+            
             try {
                 const response = await fetch(BACKEND_URL + '/api/add', {
                     method: 'POST',
