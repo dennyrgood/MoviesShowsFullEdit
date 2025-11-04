@@ -349,24 +349,24 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.8em; /* Reduced from 0.9em */
+    font-size: 0.7em; /* Further reduced from 0.8em */
     table-layout: auto;
-    line-height: 1.3; /* Tighter line spacing */
+    line-height: 1.2; /* Even tighter line spacing */
 }
 
 .data-table th, .data-table td {
-    padding: 6px 4px; /* Reduced padding for more space */
+    padding: 4px 3px; /* Further reduced padding */
     text-align: left;
-    border-bottom: 1px solid #e0e0e0; /* Lighter, thinner border */
+    border-bottom: 1px solid #e0e0e0;
     white-space: normal;
-    word-break: break-word; /* Break long unbroken strings */
-    overflow-wrap: break-word; /* Fallback for older browsers */
-    min-width: 35px; /* Reduced base min-width */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 30px; /* Further reduced base min-width */
 }
 
 /* Style for calculated fields (B, D, E) */
 .data-table td.calculated-field {
-    background-color: #f0f0ff; /* Light blue/lavender background */
+    background-color: #f0f0ff;
     font-style: italic;
     color: #555;
     cursor: default;
@@ -374,9 +374,9 @@
 
 /* Row index - super compact */
 .data-table tr > td:nth-child(1) {
-    min-width: 25px;
-    max-width: 35px;
-    padding: 6px 2px;
+    min-width: 20px;
+    max-width: 30px;
+    padding: 4px 2px;
     text-align: center;
     font-size: 0.9em;
 }
@@ -387,24 +387,25 @@
 .data-table td[data-field-key="C"], /* C (Pri) */
 .data-table td[data-field-key="D"], /* D (With) */
 .data-table td[data-field-key="E"], /* E (Avail) */
-.data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow */
-.data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow */
+.data-table td[data-field-key="col_g"], /* G (Next) */
+.data-table td[data-field-key="col_h"], /* H (Num) */
 .data-table td[data-field-key="col_i"], /* I (Where) */
 .data-table td[data-field-key="col_j"] /* J (Date Avail) */
 {
-    min-width: 30px; /* Smallest minimum width */
-    max-width: 80px; /* Prevent these from expanding too much */
-    font-size: 0.95em; /* Slightly smaller for narrow columns */
+    min-width: 25px; /* Further reduced */
+    max-width: 70px; /* Tighter constraint */
+    font-size: 0.95em;
+    padding: 4px 2px; /* Tighter padding for narrow columns */
 }
 
 /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
 .data-table td[data-field-key="title"], /* F */
-.data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE */
-.data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE */
+.data-table td[data-field-key="col_k"], /* K (URL) */
+.data-table td[data-field-key="col_l"], /* L (Notes) */
 .data-table td[data-field-key="col_m"] /* M (Synopsis) */
 {
-    min-width: 80px; /* Reduced base width */
-    max-width: 200px; /* Limit maximum width */
+    min-width: 70px; /* Further reduced */
+    max-width: 180px; /* Tighter constraint */
 }
 
 .data-table th {
@@ -414,7 +415,8 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    font-size: 0.9em; /* Slightly smaller headers */
+    font-size: 0.85em; /* Smaller headers */
+    padding: 5px 3px; /* Slightly more padding than cells for readability */
 }
 
 .data-table tr:hover {
@@ -424,18 +426,24 @@
 .data-table td input[type="text"], 
 .data-table td input[type="number"],
 .data-table td select {
-    padding: 3px 4px; /* Reduced from 5px */
+    padding: 2px 3px; /* More compact inputs */
     border: 1px solid #ddd;
     width: 100%;
-    min-width: 50px; /* Reduced from 80px */
+    min-width: 40px; /* Further reduced */
     box-sizing: border-box;
-    font-size: inherit; /* Match table font size */
+    font-size: inherit;
+}
+
+/* Make buttons more compact */
+.data-table td button {
+    padding: 3px 6px;
+    font-size: 0.9em;
+    margin: 1px;
 }
 
 /* Hide less critical columns on smaller screens */
 @media (max-width: 1400px) {
-    .data-table td[data-field-key="col_j"], /* Date Avail */
-    .data-table th:has(+ th + th + th + th + th + th + th + th + th + th) /* Corresponding header */
+    .data-table td[data-field-key="col_j"] /* Date Avail */
     {
         display: none;
     }
@@ -451,28 +459,13 @@
 
 @media (max-width: 1000px) {
     .data-table {
-        font-size: 0.75em; /* Even smaller on small screens */
+        font-size: 0.65em; /* Even smaller on small screens */
     }
     
     .data-table th, .data-table td {
-        padding: 4px 3px; /* Extra compact */
+        padding: 3px 2px; /* Extra compact */
     }
 }
-    box-sizing: border-box;
-}
-        .data-table tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        .data-table td input[type="text"], 
-        .data-table td input[type="number"],
-        .data-table td select {
-            padding: 5px;
-            border: 1px solid #ddd;
-            width: 100%;
-            min-width: 80px;
-            box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
