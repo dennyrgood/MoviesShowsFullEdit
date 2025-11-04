@@ -207,6 +207,8 @@
             overflow-x: auto;
             max-height: 70vh; /* Limit height for long tables */
         }
+     
+        /* old data table:
         
         .data-table {
             width: 100%;
@@ -216,44 +218,44 @@
         }
 
         .data-table th, .data-table td {
-            padding: 12px 10px; /* Reduced padding slightly for more columns */
+            padding: 12px 10px; /* Reduced padding slightly for more columns 
             text-align: left;
             border-bottom: 1px solid #ddd;
             white-space: normal; 
             min-width: 80px; /* Base min-width */
         }
 
-        /* Style for calculated fields (B, D, E) */
+        /* Style for calculated fields (B, D, E) 
         .data-table td.calculated-field {
-            background-color: #f0f0ff; /* Light blue/lavender background */
+            background-color: #f0f0ff; /* Light blue/lavender background 
             font-style: italic;
             color: #555;
             cursor: default;
         }
 
-        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
-        .data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) */
-        .data-table td[data-field-key="code"], /* A */
-        .data-table td[data-field-key="B"], /* B (Sub) */
-        .data-table td[data-field-key="C"], /* C (Pri) */
-        .data-table td[data-field-key="D"], /* D (With) */
-        .data-table td[data-field-key="E"], /* E (Avail) */
-        .data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow */
-        .data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow */
-        .data-table td[data-field-key="col_i"], /* I (Where) */
-        .data-table td[data-field-key="col_j"] /* J (Date Avail) */
+        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail 
+        .data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) 
+        .data-table td[data-field-key="code"], /* A 
+        .data-table td[data-field-key="B"], /* B (Sub) 
+        .data-table td[data-field-key="C"], /* C (Pri) 
+        .data-table td[data-field-key="D"], /* D (With) 
+        .data-table td[data-field-key="E"], /* E (Avail) 
+        .data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow 
+        .data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow 
+        .data-table td[data-field-key="col_i"], /* I (Where) 
+        .data-table td[data-field-key="col_j"] /* J (Date Avail) 
         {
-            min-width: 30px; /* Smallest minimum width - Matches Row Index width */
+            min-width: 30px; /* Smallest minimum width - Matches Row Index width 
             white-space: normal; 
         }
 
-        /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
-        .data-table td[data-field-key="title"], /* F */
-        .data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE */
-        .data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE */
-        .data-table td[data-field-key="col_m"] /* M (Synopsis) */
+        /* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) 
+        .data-table td[data-field-key="title"], /* F 
+        .data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE
+        .data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE 
+        .data-table td[data-field-key="col_m"] /* M (Synopsis) 
         {
-            min-width: 100px; /* Give text fields a base width */
+            min-width: 100px; /* Give text fields a base width 
             white-space: normal;
         }
 
@@ -266,6 +268,81 @@
             z-index: 10;
         }
 
+        */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    table-layout: auto;
+}
+
+.data-table th, .data-table td {
+    padding: 8px 6px; /* Reduced padding for more space */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: normal;
+    word-break: break-word; /* Break long unbroken strings */
+    overflow-wrap: break-word; /* Fallback for older browsers */
+    min-width: 40px; /* Reduced base min-width */
+}
+
+/* Style for calculated fields (B, D, E) */
+.data-table td.calculated-field {
+    background-color: #f0f0ff; /* Light blue/lavender background */
+    font-style: italic;
+    color: #555;
+    cursor: default;
+}
+
+/* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next, Num, Where, Date Avail */
+.data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) */
+.data-table td[data-field-key="code"], /* A */
+.data-table td[data-field-key="B"], /* B (Sub) */
+.data-table td[data-field-key="C"], /* C (Pri) */
+.data-table td[data-field-key="D"], /* D (With) */
+.data-table td[data-field-key="E"], /* E (Avail) */
+.data-table td[data-field-key="col_g"], /* G (Next) -- Now narrow */
+.data-table td[data-field-key="col_h"], /* H (Num) -- Now narrow */
+.data-table td[data-field-key="col_i"], /* I (Where) */
+.data-table td[data-field-key="col_j"] /* J (Date Avail) */
+{
+    min-width: 30px; /* Smallest minimum width */
+    max-width: 80px; /* Prevent these from expanding too much */
+}
+
+/* Flexible columns: Title (F), URL (K), Notes (L), Synopsis (M) */
+.data-table td[data-field-key="title"], /* F */
+.data-table td[data-field-key="col_k"], /* K (URL) -- NOW FLEXIBLE */
+.data-table td[data-field-key="col_l"], /* L (Notes) -- NOW FLEXIBLE */
+.data-table td[data-field-key="col_m"] /* M (Synopsis) */
+{
+    min-width: 80px; /* Reduced base width */
+    max-width: 200px; /* Limit maximum width */
+}
+
+.data-table th {
+    background-color: #f4f4f4;
+    font-weight: 700;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.data-table td input[type="text"], 
+.data-table td input[type="number"],
+.data-table td select {
+    padding: 5px;
+    border: 1px solid #ddd;
+    width: 100%;
+    min-width: 60px; /* Reduced from 80px */
+    box-sizing: border-box;
+}
         .data-table tr:hover {
             background-color: #f9f9f9;
         }
