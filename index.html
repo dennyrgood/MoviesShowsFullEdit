@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies & Shows - Full Editor</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         * {
             margin: 0;
             padding: 0;
@@ -12,7 +13,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
@@ -233,10 +234,10 @@
         /* Narrow columns: Code, B, C, D, E, Sub, Pri, With, Avail, Season to, made */
         .data-table tr > td:nth-child(1), /* Row Index */
         .data-table td[data-field-key="code"], /* A */
-        .data-table td[data-field-key="col_b"], /* B (Sub (b)) */
-        .data-table td[data-field-key="col_c"], /* C (Pri) */
-        .data-table td[data-field-key="col_d"], /* D (With (c)) */
-        .data-table td[data-field-key="col_e"], /* E (Avail (c)) */
+        .data-table td[data-field-key="B"], /* B (Sub (b)) -- FIXED KEY */
+        .data-table td[data-field-key="C"], /* C (Pri) -- FIXED KEY */
+        .data-table td[data-field-key="D"], /* D (With (c)) -- FIXED KEY */
+        .data-table td[data-field-key="E"], /* E (Avail (c)) -- FIXED KEY */
         .data-table td[data-field-key="col_g"], /* G (Next Season) */
         .data-table td[data-field-key="col_h"], /* H (Num Seasons) */
         .data-table td[data-field-key="col_i"], /* I (Where) */
@@ -312,10 +313,10 @@
                         <label for="add-code">Code (A)</label>
                         <input type="number" id="add-code" name="code" required>
                     </div>
-                    <!-- 2. Pri (col_c) - C (Data cell, remains editable) -->
+                    <!-- 2. Pri (C) - C (Input field name fixed to "C") -->
                     <div class="form-group">
-                        <label for="add-col_c">Pri (C)</label>
-                        <input type="text" id="add-col_c" name="col_c">
+                        <label for="add-C">Pri (C)</label>
+                        <input type="text" id="add-C" name="C">
                     </div>
                     <!-- 3. Title (title) - F -->
                     <div class="form-group">
@@ -370,21 +371,21 @@
         let allRows = [];
         let currentlyEditingRow = null;
 
-        // FIELD_MAP defines the order and keys, marking calculated fields
+        // FIELD_MAP defines the order and keys, MATCHING THE EXACT JSON KEYS from the API
         const FIELD_MAP = [
-            { key: 'code', label: 'Code', type: 'number', required: true },       // Col A
-            { key: 'col_b', label: 'Sub (b)', type: 'text', calculated: true },   // Col B - CALCULATED (Label updated)
-            { key: 'col_c', label: 'Pri', type: 'text' },                        // Col C - INPUT FIELD (Label updated)
-            { key: 'col_d', label: 'With (c)', type: 'text', calculated: true },  // Col D - CALCULATED
-            { key: 'col_e', label: 'Avail (c)', type: 'text', calculated: true }, // Col E - CALCULATED
-            { key: 'title', label: 'Title', type: 'text', required: true },      // Col F
-            { key: 'col_g', label: 'Next Season', type: 'text' },                // Col G
-            { key: 'col_h', label: 'Num Seasons', type: 'text' },                // Col H
-            { key: 'col_i', label: 'Where', type: 'text' },                      // Col I
-            { key: 'col_j', label: 'Date Avail', type: 'text' },                 // Col J
-            { key: 'col_k', label: 'URL', type: 'text' },                        // Col K
-            { key: 'col_l', label: 'Notes', type: 'text' },                      // Col L
-            { key: 'col_m', label: 'Synopsis', type: 'text' }                    // Col M
+            { key: 'code', label: 'Code', type: 'number', required: true },       // Col A (JSON key: "code")
+            { key: 'B', label: 'Sub (B)', type: 'text', calculated: true },       // Col B (JSON key: "B") - CALCULATED
+            { key: 'C', label: 'Pri (C)', type: 'text' },                        // Col C (JSON key: "C") - INPUT FIELD
+            { key: 'D', label: 'With (D)', type: 'text', calculated: true },      // Col D (JSON key: "D") - CALCULATED
+            { key: 'E', label: 'Avail (E)', type: 'text', calculated: true },     // Col E (JSON key: "E") - CALCULATED
+            { key: 'title', label: 'Title', type: 'text', required: true },      // Col F (JSON key: "title")
+            { key: 'col_g', label: 'Next Season', type: 'text' },                // Col G (JSON key: "col_g")
+            { key: 'col_h', label: 'Num Seasons', type: 'text' },                // Col H (JSON key: "col_h")
+            { key: 'col_i', label: 'Where', type: 'text' },                      // Col I (JSON key: "col_i")
+            { key: 'col_j', label: 'Date Avail', type: 'text' },                 // Col J (JSON key: "col_j")
+            { key: 'col_k', label: 'URL', type: 'text' },                        // Col K (JSON key: "col_k")
+            { key: 'col_l', label: 'Notes', type: 'text' },                      // Col L (JSON key: "col_l")
+            { key: 'col_m', label: 'Synopsis', type: 'text' }                    // Col M (JSON key: "col_m")
         ];
 
         // --- Utility Functions ---
@@ -439,8 +440,8 @@
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    // Assuming data.data now returns objects with all keys defined in FIELD_MAP (A-M)
-                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0)); // Sort by code descending
+                    // Sort by code descending
+                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0)); 
                     renderTable(tab);
                     showMessage(`✓ Successfully loaded ${allRows.length} rows.`, 'success', tab);
                 } else {
@@ -464,7 +465,7 @@
             const table = document.createElement('table');
             table.className = 'data-table';
             
-            // Generate headers (Headers remain the same, following the FIELD_MAP labels)
+            // Generate headers
             const thead = table.createTHead();
             let headers = ['Row', ...FIELD_MAP.map(f => f.label), 'Action'];
             let headerRow = thead.insertRow();
@@ -484,10 +485,11 @@
                 let cellIndex = tr.insertCell();
                 cellIndex.textContent = row.row_index;
 
-                // Data Cells (rendered according to the KEY order in FIELD_MAP (A-M)
+                // Data Cells (rendered according to the KEY order in FIELD_MAP)
                 FIELD_MAP.forEach(field => {
                     let td = tr.insertCell();
                     td.dataset.fieldKey = field.key;
+                    // Use the exact API key to retrieve data
                     td.textContent = row[field.key] !== null && row[field.key] !== undefined ? row[field.key] : '';
                     if (field.calculated) {
                         td.classList.add('calculated-field');
@@ -572,8 +574,10 @@
             // Restore original text content
             row.querySelectorAll('td[data-field-key]').forEach(td => {
                 const fieldKey = td.dataset.fieldKey;
+                // Use the exact API key to retrieve data
                 td.textContent = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
-                // Remove calculated-field class if we are restoring from edit state
+                
+                // Restore calculated-field class if necessary
                 const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
                  if (fieldInfo.calculated) {
                     td.classList.add('calculated-field');
@@ -596,7 +600,7 @@
             const payload = { row_index: rowIndex };
             let hasChanges = false;
             
-            // Collect data ONLY from input fields (skips calculated fields)
+            // Collect data ONLY from input fields (skips calculated fields B, D, E)
             row.querySelectorAll('.edit-field').forEach(input => {
                 const key = input.dataset.key;
                 const newValue = input.value;
@@ -604,16 +608,13 @@
                 hasChanges = true;
             });
             
-            // NOTE: Calculated fields (B, D, E) are excluded from the payload automatically
-            // because they never became input fields.
-            
             if (!hasChanges) {
                 showMessage('No changes detected.', 'warning', 'data-view');
                 cancelEdit(rowIndex);
                 return;
             }
 
-            // Client-side validation for required fields (Code and Title, F)
+            // Client-side validation for required fields (Code and Title)
             const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
             
             for (const key of requiredFields) {
@@ -717,6 +718,7 @@
             }
 
             // Client-side validation
+            // Note: Required fields are 'code' and 'title' based on FIELD_MAP definition
             const requiredFields = FIELD_MAP.filter(f => f.required).map(f => f.key);
             for (const key of requiredFields) {
                 if (!payload[key]) {
