@@ -231,13 +231,13 @@
             cursor: default;
         }
 
-        /* Narrow columns: Code, B, C, D, E, Sub, Pri, With, Avail, Season to, made */
-        .data-table tr > td:nth-child(1), /* Row Index */
+        /* Narrow columns: Row Index, Code, Sub(B), Pri(C), D, E, Next Season, Num Seasons, Where, Date Avail, URL, Notes */
+        .data-table tr > td:nth-child(1), /* Row Index (The goal width for Sub(B) and Pri(C)) */
         .data-table td[data-field-key="code"], /* A */
-        .data-table td[data-field-key="B"], /* B (Sub (b)) -- FIXED KEY */
-        .data-table td[data-field-key="C"], /* C (Pri) -- FIXED KEY */
-        .data-table td[data-field-key="D"], /* D (With (c)) -- FIXED KEY */
-        .data-table td[data-field-key="E"], /* E (Avail (c)) -- FIXED KEY */
+        .data-table td[data-field-key="B"], /* B (Sub) -- REDUCED WIDTH */
+        .data-table td[data-field-key="C"], /* C (Pri) -- REDUCED WIDTH */
+        .data-table td[data-field-key="D"], /* D (With) -- FIXED KEY */
+        .data-table td[data-field-key="E"], /* E (Avail) -- FIXED KEY */
         .data-table td[data-field-key="col_g"], /* G (Next Season) */
         .data-table td[data-field-key="col_h"], /* H (Num Seasons) */
         .data-table td[data-field-key="col_i"], /* I (Where) */
@@ -245,7 +245,7 @@
         .data-table td[data-field-key="col_k"], /* K (URL) */
         .data-table td[data-field-key="col_l"] /* L (Notes) */
         {
-            min-width: 60px; /* Smallest minimum width */
+            min-width: 60px; /* Smallest minimum width - Matches Row Index width */
             white-space: nowrap; 
         }
 
@@ -372,12 +372,13 @@
         let currentlyEditingRow = null;
 
         // FIELD_MAP defines the order and keys, MATCHING THE EXACT JSON KEYS from the API
+        // Removed (B), (C), (D), (E) from labels
         const FIELD_MAP = [
             { key: 'code', label: 'Code', type: 'number', required: true },       // Col A (JSON key: "code")
-            { key: 'B', label: 'Sub (B)', type: 'text', calculated: true },       // Col B (JSON key: "B") - CALCULATED
-            { key: 'C', label: 'Pri (C)', type: 'text' },                        // Col C (JSON key: "C") - INPUT FIELD
-            { key: 'D', label: 'With (D)', type: 'text', calculated: true },      // Col D (JSON key: "D") - CALCULATED
-            { key: 'E', label: 'Avail (E)', type: 'text', calculated: true },     // Col E (JSON key: "E") - CALCULATED
+            { key: 'B', label: 'Sub', type: 'text', calculated: true },           // Col B (JSON key: "B") - CALCULATED
+            { key: 'C', label: 'Pri', type: 'text' },                            // Col C (JSON key: "C") - INPUT FIELD
+            { key: 'D', label: 'With', type: 'text', calculated: true },          // Col D (JSON key: "D") - CALCULATED
+            { key: 'E', label: 'Avail', type: 'text', calculated: true },         // Col E (JSON key: "E") - CALCULATED
             { key: 'title', label: 'Title', type: 'text', required: true },      // Col F (JSON key: "title")
             { key: 'col_g', label: 'Next Season', type: 'text' },                // Col G (JSON key: "col_g")
             { key: 'col_h', label: 'Num Seasons', type: 'text' },                // Col H (JSON key: "col_h")
@@ -456,6 +457,22 @@
         
         // --- Table Rendering and Interaction ---
 
+        function formatValue(key, value) {
+            if (value === null || value === undefined || value === '') return '';
+
+            // Handle number formatting as requested
+            if (key === 'B') { // Sub(B) -> #.# format
+                const num = parseFloat(value);
+                return isNaN(num) ? value : num.toFixed(1);
+            }
+            if (key === 'C') { // Pri(C) -> # format
+                const num = parseInt(value);
+                return isNaN(num) ? value : Math.round(num).toString();
+            }
+
+            return value;
+        }
+
         function renderTable(tab) {
             if (allRows.length === 0) {
                 dataViewContainer.innerHTML = `<p>No data found or table is empty.</p>`;
@@ -489,8 +506,11 @@
                 FIELD_MAP.forEach(field => {
                     let td = tr.insertCell();
                     td.dataset.fieldKey = field.key;
-                    // Use the exact API key to retrieve data
-                    td.textContent = row[field.key] !== null && row[field.key] !== undefined ? row[field.key] : '';
+                    
+                    // Apply formatting before setting text content
+                    const rawValue = row[field.key];
+                    td.textContent = formatValue(field.key, rawValue);
+                    
                     if (field.calculated) {
                         td.classList.add('calculated-field');
                     }
@@ -540,11 +560,14 @@
                         return; 
                     }
                     
-                    const originalValue = td.textContent;
+                    // Retrieve original value from allRows data structure for editing
+                    const originalRowData = allRows.find(r => r.row_index === rowIndex);
+                    const originalValue = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
+
 
                     let input = document.createElement('input');
                     input.type = fieldInfo.type || 'text';
-                    input.value = originalValue;
+                    input.value = originalValue; // Set input value to the raw original data
                     input.className = 'edit-field';
                     input.dataset.key = fieldKey;
                     if (fieldInfo.step) input.step = fieldInfo.step;
@@ -556,8 +579,8 @@
                 // Add Cancel button
                 const actionCell = row.cells[row.cells.length - 1];
                 actionCell.innerHTML = `
-                    <button class="btn-save" onclick="toggleEdit(${rowIndex}, this)">Save</button>
-                    <button class="btn-delete" onclick="cancelEdit(${rowIndex}, this)">Cancel</button>
+                    <button class="btn-save" onclick="saveRow(${rowIndex}, row)">Save</button>
+                    <button class="btn-delete" onclick="cancelEdit(${rowIndex})">Cancel</button>
                 `;
             }
         }
@@ -571,11 +594,13 @@
             
             const originalRowData = allRows.find(r => r.row_index === rowIndex);
             
-            // Restore original text content
+            // Restore original text content (formatted)
             row.querySelectorAll('td[data-field-key]').forEach(td => {
                 const fieldKey = td.dataset.fieldKey;
-                // Use the exact API key to retrieve data
-                td.textContent = originalRowData[fieldKey] !== null && originalRowData[fieldKey] !== undefined ? originalRowData[fieldKey] : '';
+                const rawValue = originalRowData[fieldKey];
+                
+                // Apply formatting before setting text content
+                td.textContent = formatValue(fieldKey, rawValue);
                 
                 // Restore calculated-field class if necessary
                 const fieldInfo = FIELD_MAP.find(f => f.key === fieldKey);
