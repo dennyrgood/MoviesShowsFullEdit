@@ -8,11 +8,18 @@ jobs:
     env:
       BRANCH: feature/ui-add-delay-legend-move
       COMMIT_MSG: "feat(ui): add delay after add submission, update data-view heading, move code legend under add form"
+      PR_TITLE: "UI: delay after add, update data-view heading, move code legend under add-new form"
+      PR_BODY: |
+        Summary:
+        - Adds a short delay (3s) before switching to Data View after a successful Add New Entry submission.
+        - Updates the Data View heading.
+        - Moves the Code Legend under the Add New form.
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Validate PAT (do not print it)
         env:
@@ -32,9 +39,38 @@ jobs:
 
       - name: Create branch from main
         run: |
-          git checkout -b $BRANCH
+          git checkout -b "$BRANCH"
 
-      - name: Write new index.html
-        # This writes the full updated index.html content into the workspace.
+      - name: Ensure index.html is present
+        # If you keep a prepared copy under .github/prepared/index.html, it will be used.
+        # Otherwise this step expects index.html to already exist in the repo root.
         run: |
-          cat > index.html <<'EOF'
+          if [ -f .github/prepared/index.html ]; then
+            echo "Using .github/prepared/index.html"
+            cp .github/prepared/index.html ./index.html
+          else
+            echo ".github/prepared/index.html not found, expecting index.html to exist in repo root"
+          fi
+          if [ ! -f index.html ]; then
+            echo "ERROR: index.html not found in workspace. Put your prepared file at .github/prepared/index.html or at repo root index.html."
+            exit 1
+          fi
+          echo "index.html size: $(wc -c < index.html) bytes"
+
+      - name: Commit and push branch using PAT
+        env:
+          GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
+        run: |
+          git add index.html
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          # Push using the PAT in the HTTPS URL for this push only
+          git push https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }} $BRANCH --set-upstream
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_PUSH_PAT }}
+          base: main
+          head: ${{ env.BRANCH }}
+          title: ${{ env.PR_TITLE }}
+          body: ${{ env.PR_BODY }}
