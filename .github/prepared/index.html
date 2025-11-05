@@ -582,10 +582,18 @@
         function openTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabName).classList.remove('hidden');
-            document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-            if (tabName === 'data-view') loadRows('data-view'); 
+            const target = document.getElementById(tabName);
+            if (target) target.classList.remove('hidden');
+            const btn = Array.from(document.querySelectorAll('.tab-button')).find(b => {
+                const oc = b.getAttribute('onclick') || '';
+                return oc.includes(`openTab('${tabName}')`) || oc.includes(`openTab("${tabName}")`) || b.dataset.tab === tabName;
+            });
+            if (btn) btn.classList.add('active');
+            if (tabName === 'data-view' && typeof loadRows === 'function') {
+                try { loadRows('data-view'); } catch (err) { console.warn('loadRows failed:', err); }
+            }
         }
+        window.openTab = openTab;
 
         function showMessage(text, type, tab) {
             const msgDiv = document.getElementById(tab + '-message');
@@ -605,11 +613,11 @@
                     renderTable(tab);
                     showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
-                    showMessage('Error loading data: ' + data.message, 'error', tab);
-                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + data.message + '</p>';
+                    showMessage('Error loading data: ' + (data.message || 'unknown'), 'error', tab);
+                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + (data.message || 'unknown') + '</p>';
                 }
             } catch (error) {
-                showMessage('Network error: Could not connect to backend. ' + error.message, 'error', tab);
+                showMessage('Network error: Could not connect to backend. ' + (error.message || ''), 'error', tab);
                 dataViewContainer.innerHTML = '<p style="color: red;">Network Error</p>';
             }
         }
@@ -688,4 +696,132 @@
                     return;
                 }
 
-EOF
+                // turn row into editable inputs
+                row.classList.add('editing');
+                currentlyEditingRow = rowIndex;
+                button.textContent = 'Save';
+                button.classList.remove('btn-save');
+                button.classList.add('btn-save');
+
+                Array.from(row.cells).forEach(td => {
+                    const key = td.dataset.fieldKey;
+                    if (!key) return;
+                    if (['code'].includes(key)) {
+                        const val = td.textContent || '';
+                        td.innerHTML = '<input type="number" value="' + (val) + '">';
+                    } else if (['title', 'col_k', 'col_l', 'col_m'].includes(key)) {
+                        const val = td.textContent || '';
+                        td.innerHTML = '<input type="text" value="' + (val) + '">';
+                    } else {
+                        // leave calculated or small fields read-only
+                        const val = td.textContent || '';
+                        td.innerHTML = '<input type="text" value="' + (val) + '">';
+                    }
+                });
+            }
+        }
+
+        async function saveRow(rowIndex, rowElement) {
+            const inputs = rowElement.querySelectorAll('input, select');
+            const payload = { row_index: rowIndex };
+            inputs.forEach((input, i) => {
+                const td = input.closest('td');
+                const key = td ? td.dataset.fieldKey : null;
+                if (key) payload[key] = input.value;
+            });
+
+            try {
+                const r = await fetch(BACKEND_URL + '/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await r.json();
+                if (r.ok && data.status === 'success') {
+                    showMessage('Saved row ' + rowIndex, 'success', 'data-view');
+                    // refresh rows
+                    loadRows('data-view');
+                } else {
+                    showMessage('Failed to save: ' + (data.message || 'unknown'), 'error', 'data-view');
+                }
+            } catch (err) {
+                showMessage('Network error: ' + (err.message || ''), 'error', 'data-view');
+            }
+        }
+
+        async function deleteRow(rowIndex, title) {
+            if (!confirm('Delete row ' + rowIndex + ' — ' + title + '?')) return;
+            try {
+                const r = await fetch(BACKEND_URL + '/api/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowIndex })
+                });
+                const data = await r.json();
+                if (r.ok && data.status === 'success') {
+                    showMessage('Deleted row ' + rowIndex, 'success', 'data-view');
+                    loadRows('data-view');
+                } else {
+                    showMessage('Failed to delete: ' + (data.message || 'unknown'), 'error', 'data-view');
+                }
+            } catch (err) {
+                showMessage('Network error: ' + (err.message || ''), 'error', 'data-view');
+            }
+        }
+
+        function duplicateRow(rowIndex) {
+            const row = allRows.find(r => r.row_index === rowIndex);
+            if (!row) return;
+            const copy = Object.assign({}, row);
+            delete copy.row_index;
+            // create a new row via API
+            fetch(BACKEND_URL + '/api/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(copy)
+            }).then(r => r.json()).then(data => {
+                if (data.status === 'success') {
+                    showMessage('Duplicated row ' + rowIndex, 'success', 'data-view');
+                    loadRows('data-view');
+                } else {
+                    showMessage('Failed to duplicate: ' + (data.message || 'unknown'), 'error', 'data-view');
+                }
+            }).catch(err => {
+                showMessage('Network error: ' + (err.message || ''), 'error', 'data-view');
+            });
+        }
+
+        // Add form handling for adding new entries
+        document.addEventListener('DOMContentLoaded', () => {
+            const addForm = document.getElementById('add-form');
+            if (addForm) {
+                addForm.addEventListener('submit', async (ev) => {
+                    ev.preventDefault();
+                    const formData = new FormData(addForm);
+                    const payload = {};
+                    for (const [k, v] of formData.entries()) payload[k] = v;
+                    try {
+                        const r = await fetch(BACKEND_URL + '/api/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await r.json();
+                        if (r.ok && data.status === 'success') {
+                            showMessage('Successfully added entry', 'success', 'add-new');
+                            // wait a short delay then switch back to data view to let backend settle
+                            setTimeout(() => {
+                                openTab('data-view');
+                            }, 3000);
+                        } else {
+                            showMessage('Failed to add: ' + (data.message || 'unknown'), 'error', 'add-new');
+                        }
+                    } catch (err) {
+                        showMessage('Network error: ' + (err.message || ''), 'error', 'add-new');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
