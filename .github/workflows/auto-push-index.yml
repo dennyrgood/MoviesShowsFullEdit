@@ -2,7 +2,6 @@ name: Auto Push Index
 on:
   workflow_dispatch:
 
-
 jobs:
   push-and-pr:
     runs-on: ubuntu-latest
@@ -43,8 +42,6 @@ jobs:
           git checkout -b "$BRANCH"
 
       - name: Ensure index.html is present
-        # If you keep a prepared copy under .github/prepared/index.html, it will be used.
-        # Otherwise this step expects index.html to already exist in the repo root.
         run: |
           if [ -f .github/prepared/index.html ]; then
             echo "Using .github/prepared/index.html"
@@ -58,14 +55,15 @@ jobs:
           fi
           echo "index.html size: $(wc -c < index.html) bytes"
 
-      - name: Commit and push branch using PAT
+      - name: Commit and push branch using PAT (explicit remote URL)
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
         run: |
           git add index.html
           git commit -m "$COMMIT_MSG" || echo "No changes to commit"
-          # Push using the PAT in the HTTPS URL for this push only
-          git push https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }} $BRANCH --set-upstream
+          # Replace origin with a PAT-authenticated HTTPS URL for this push only
+          git remote set-url origin "https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}"
+          git push origin "$BRANCH" --set-upstream
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
