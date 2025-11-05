@@ -578,7 +578,7 @@
             { key: 'col_l', label: 'Notes', type: 'text' },
             { key: 'col_m', label: 'Synopsis', type: 'text' }
         ];
-
+/*
         function openTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -586,7 +586,38 @@
             document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
             if (tabName === 'data-view') loadRows('data-view');
         }
+*/
+        
+function openTab(tabName) {
+    // hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+    // remove active from all buttons
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
 
+    // show the requested tab content
+    const target = document.getElementById(tabName);
+    if (target) target.classList.remove('hidden');
+
+    // find a matching tab button more robustly (matches onclick attribute or data-tab)
+    const btn = Array.from(document.querySelectorAll('.tab-button')).find(b => {
+        const oc = b.getAttribute('onclick') || '';
+        if (oc.includes(`openTab('${tabName}')`) || oc.includes(`openTab("${tabName}")`)) return true;
+        if (b.dataset && b.dataset.tab === tabName) return true;
+        return false;
+    });
+    if (btn) btn.classList.add('active');
+
+    // load rows when showing the data view
+    if (tabName === 'data-view' && typeof loadRows === 'function') {
+        loadRows('data-view');
+    }
+}
+window.openTab = openTab;
+
+// call the same UI path that the tab buttons use
+window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
+
+        
         function showMessage(text, type, tab) {
             const msgDiv = document.getElementById(tab + '-message');
             msgDiv.textContent = text;
