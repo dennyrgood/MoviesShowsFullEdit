@@ -56,15 +56,24 @@ jobs:
           fi
           echo "index.html size: $(wc -c < index.html) bytes"
 
-      - name: Commit and push branch using PAT (explicit header)
+      - name: Commit and push branch using PAT (non-interactive)
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
         run: |
           git add index.html
           git commit -m "$COMMIT_MSG" || echo "No changes to commit"
-          # Use the PAT explicitly for this push by providing an HTTP authorization header.
-          # persist-credentials:false prevents using the runner's GITHUB_TOKEN.
-          git -c http.extraHeader="Authorization: token ${GIT_AUTH_TOKEN}" push origin "$BRANCH" --set-upstream
+
+          # Remove any existing origin to avoid credential helper / cached creds
+          git remote remove origin || true
+
+          # Add a PAT-authenticated remote (temporary for this push)
+          git remote add origin "https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}.git"
+
+          # Prevent git from prompting for credentials interactively
+          export GIT_TERMINAL_PROMPT=0
+
+          # Ensure no credential helper intercepts the HTTP request
+          git -c credential.helper= push origin "$BRANCH" --set-upstream
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
