@@ -476,7 +476,7 @@
                 const response = await fetch(BACKEND_URL + '/api/data');
                 const data = await response.json();
                 if (response.ok && data.status === 'success') {
-                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0));
+                    allRows = data.data.sort((a, b) => (a.row_index || 0) - (b.row_index || 0));
                     renderTable(tab);
                     showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
@@ -783,6 +783,20 @@
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
+                    showMessage('✓ SUCCESS: ' + data.message + '. Switching to Data View...', 'success', 'add-new');
+                    form.reset();
+                    setTimeout(() => {
+                        openTab('data-view');
+                    }, 2000);
+
+                } else {
+                    showMessage('✗ ERROR: ' + data.message, 'error', 'add-new');
+                }
+
+
+            /*
+                
+                if (response.ok && data.status === 'success') {
                     showMessage(data.message + '. Now available in Data View.', 'success', 'add-new');
                     form.reset();
                     openTab('data-view');
@@ -791,6 +805,9 @@
                 }
             } catch (error) {
                 showMessage('Network error: ' + error.message, 'error', 'add-new');
+                
+            */
+                
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit New Entry';
