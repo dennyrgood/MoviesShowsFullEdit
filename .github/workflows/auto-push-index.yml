@@ -15,11 +15,12 @@ jobs:
         - Updates the Data View heading.
         - Moves the Code Legend under the Add New form.
     steps:
-      - name: Checkout main
+      - name: Checkout main (no persisted credentials)
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate PAT (do not print it)
         env:
@@ -55,15 +56,15 @@ jobs:
           fi
           echo "index.html size: $(wc -c < index.html) bytes"
 
-      - name: Commit and push branch using PAT (explicit remote URL)
+      - name: Commit and push branch using PAT (explicit header)
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
         run: |
           git add index.html
           git commit -m "$COMMIT_MSG" || echo "No changes to commit"
-          # Replace origin with a PAT-authenticated HTTPS URL for this push only
-          git remote set-url origin "https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}"
-          git push origin "$BRANCH" --set-upstream
+          # Use the PAT explicitly for this push by providing an HTTP authorization header.
+          # persist-credentials:false prevents using the runner's GITHUB_TOKEN.
+          git -c http.extraHeader="Authorization: token ${GIT_AUTH_TOKEN}" push origin "$BRANCH" --set-upstream
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
