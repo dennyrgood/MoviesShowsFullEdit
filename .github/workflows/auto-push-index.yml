@@ -6,7 +6,8 @@ jobs:
   push-and-pr:
     runs-on: ubuntu-latest
     env:
-      BRANCH: feature/ui-add-delay-legend-move
+      # branch will be unique per run to avoid stale/non-fast-forward errors
+      BRANCH_PREFIX: feature/ui-add-delay-legend-move
       COMMIT_MSG: "feat(ui): add delay after add submission, update data-view heading, move code legend under add form"
       PR_TITLE: "UI: delay after add, update data-view heading, move code legend under add-new form"
       PR_BODY: |
@@ -21,6 +22,11 @@ jobs:
           ref: main
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Build unique branch name
+        run: |
+          # Use github.run_id to guarantee uniqueness per workflow run
+          echo "BRANCH=${BRANCH_PREFIX}-${{ github.run_id }}" >> $GITHUB_ENV
 
       - name: Validate PAT (do not print it)
         env:
@@ -38,10 +44,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
 
-      - name: Create/reset branch from main
-        # Use -B to create the branch or reset it to main if it already exists locally
+      - name: Create branch from main
         run: |
-          git checkout -B "$BRANCH"
+          git checkout -b "$BRANCH"
 
       - name: Ensure index.html is present
         run: |
@@ -57,28 +62,25 @@ jobs:
           fi
           echo "index.html size: $(wc -c < index.html) bytes"
 
-      - name: Commit and push branch using PAT (force-with-lease)
+      - name: Commit and push branch using PAT (non-interactive, unique branch)
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
         run: |
           git add index.html
           git commit -m "$COMMIT_MSG" || echo "No changes to commit"
 
-          # Remove any existing origin to avoid credential helper / cached creds
-          git remote remove origin || true
-
           # Add a PAT-authenticated remote (temporary for this push)
+          git remote remove origin || true
           git remote add origin "https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}.git"
 
-          # Prevent git from prompting for credentials interactively
+          # Prevent interactive prompts and ensure no credential helper intercepts
           export GIT_TERMINAL_PROMPT=0
 
-          # Use --force-with-lease to update remote branch if remote is ahead (safer than --force).
-          # If branch protection disallows forced updates, this will still fail and you'll need to
-          # either delete the remote branch manually or use a unique branch name.
-          git -c credential.helper= push origin "$BRANCH" --set-upstream --force-with-lease
+          # Push the uniquely-named branch (no force needed)
+          git push origin "$BRANCH" --set-upstream
 
-      - name: Create Pull Request
+      - id: create_pr
+        name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_PUSH_PAT }}
@@ -86,3 +88,7 @@ jobs:
           head: ${{ env.BRANCH }}
           title: ${{ env.PR_TITLE }}
           body: ${{ env.PR_BODY }}
+
+      - name: Show PR URL
+        run: |
+          echo "PR URL: ${{ steps.create_pr.outputs.pull-request-url }}"
