@@ -38,9 +38,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
 
-      - name: Create branch from main
+      - name: Create/reset branch from main
+        # Use -B to create the branch or reset it to main if it already exists locally
         run: |
-          git checkout -b "$BRANCH"
+          git checkout -B "$BRANCH"
 
       - name: Ensure index.html is present
         run: |
@@ -56,7 +57,7 @@ jobs:
           fi
           echo "index.html size: $(wc -c < index.html) bytes"
 
-      - name: Commit and push branch using PAT (non-interactive)
+      - name: Commit and push branch using PAT (force-with-lease)
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GH_PUSH_PAT }}
         run: |
@@ -72,8 +73,10 @@ jobs:
           # Prevent git from prompting for credentials interactively
           export GIT_TERMINAL_PROMPT=0
 
-          # Ensure no credential helper intercepts the HTTP request
-          git -c credential.helper= push origin "$BRANCH" --set-upstream
+          # Use --force-with-lease to update remote branch if remote is ahead (safer than --force).
+          # If branch protection disallows forced updates, this will still fail and you'll need to
+          # either delete the remote branch manually or use a unique branch name.
+          git -c credential.helper= push origin "$BRANCH" --set-upstream --force-with-lease
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
