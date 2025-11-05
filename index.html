@@ -80,6 +80,53 @@
         .hidden {
             display: none;
         }
+
+        .legend-box {
+            background-color: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .legend-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .legend-section {
+            margin-bottom: 15px;
+        }
+
+        .legend-section h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .legend-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .legend-table th,
+        .legend-table td {
+            padding: 6px 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .legend-table th {
+            background-color: #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .legend-table tr:last-child td {
+            border-bottom: none;
+        }
         
         .form-grid {
             display: grid;
@@ -383,12 +430,89 @@
 
         <div id="add-new" class="tab-content hidden">
             <h2>Add New Movie/Show</h2>
-            <div id="add-message" class="message"></div>
+            <div id="add-new-message" class="message"></div>
+            
+            <div class="legend-box">
+                <h3>Code Legend</h3>
+                
+                <div class="legend-section">
+                    <h4>Whole Number (Who is interested)</h4>
+                    <table class="legend-table">
+                        <thead>
+                            <tr>
+                                <th>Code Range</th>
+                                <th>Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0.x</td>
+                                <td>Laura</td>
+                            </tr>
+                            <tr>
+                                <td>1.x</td>
+                                <td>Laura Maybe</td>
+                            </tr>
+                            <tr>
+                                <td>2.x</td>
+                                <td>Not Laura</td>
+                            </tr>
+                            <tr>
+                                <td>1000.x</td>
+                                <td>Laura Only</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="legend-section">
+                    <h4>Decimal Part (Acquisition Status)</h4>
+                    <table class="legend-table">
+                        <thead>
+                            <tr>
+                                <th>Decimal Code</th>
+                                <th>Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>.1</td>
+                                <td>Avail Now</td>
+                            </tr>
+                            <tr>
+                                <td>.4</td>
+                                <td>Weekly</td>
+                            </tr>
+                            <tr>
+                                <td>.5</td>
+                                <td>Trying to Find</td>
+                            </tr>
+                            <tr>
+                                <td>.6</td>
+                                <td>Found but $ (Paid)</td>
+                            </tr>
+                            <tr>
+                                <td>.7</td>
+                                <td>Future Date Set</td>
+                            </tr>
+                            <tr>
+                                <td>.8</td>
+                                <td>Announced as Coming</td>
+                            </tr>
+                            <tr>
+                                <td>.9</td>
+                                <td>Unknown if Coming</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <form id="add-form">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="add-code">Code (A)</label>
-                        <input type="number" id="add-code" name="code" required>
+                        <input type="number" id="add-code" name="code" step="any" required>
                     </div>
                     <div class="form-group">
                         <label for="add-C">Pri (C)</label>
@@ -476,7 +600,7 @@
                 const response = await fetch(BACKEND_URL + '/api/data');
                 const data = await response.json();
                 if (response.ok && data.status === 'success') {
-                    allRows = data.data.sort((a, b) => (b.code || 0) - (a.code || 0));
+                    allRows = data.data.sort((a, b) => (a.row_index || 0) - (b.row_index || 0));
                     renderTable(tab);
                     showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
@@ -682,22 +806,13 @@
             }
 
             const payload = {};
-
-            /*
-            FIELD_MAP.forEach(field => {
-                if (!field.calculated && originalRowData[field.key] !== undefined) {
-                    payload[field.key] = originalRowData[field.key];
-                }
-            });
-            */
-            
             FIELD_MAP.forEach(field => {
                 if (!field.calculated && originalRowData[field.key] !== undefined) {
                     const value = originalRowData[field.key];
                     payload[field.key] = value !== null && value !== undefined ? String(value).trim() : '';
                 }
             });
-            
+
             try {
                 const response = await fetch(BACKEND_URL + '/api/add', {
                     method: 'POST',
@@ -709,7 +824,23 @@
 
                 if (response.ok && data.status === 'success') {
                     showMessage(data.message, 'success', 'data-view');
-                    loadRows('data-view');
+                    await loadRows('data-view');
+                    
+                    // Find the newly created row - it should be the last one (highest row_index)
+                    const newRow = allRows[allRows.length - 1];
+                    if (newRow) {
+                        // Wait a moment for the table to render
+                        setTimeout(() => {
+                            const rowElement = document.querySelector('tr[data-row-index="' + newRow.row_index + '"]');
+                            if (rowElement) {
+                                rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                const editButton = rowElement.querySelector('.btn-save');
+                                if (editButton) {
+                                    toggleEdit(newRow.row_index, editButton);
+                                }
+                            }
+                        }, 100);
+                    }
                 } else {
                     showMessage(data.message, 'error', 'data-view');
                 }
@@ -776,11 +907,18 @@
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    showMessage(data.message + '. Now available in Data View.', 'success', 'add-new');
+                    const msgDiv = document.getElementById('add-new-message');
+                    msgDiv.textContent = '✓ SUCCESS: ' + data.message + '. Switching to Data View...';
+                    msgDiv.className = 'message show success';
+                    msgDiv.style.display = 'block';
+                    msgDiv.style.opacity = '1';
+                    msgDiv.style.height = 'auto';
                     form.reset();
-                    openTab('data-view');
+                    setTimeout(() => {
+                        openTab('data-view');
+                    }, 2000);
                 } else {
-                    showMessage(data.message, 'error', 'add-new');
+                    showMessage('✗ ERROR: ' + data.message, 'error', 'add-new');
                 }
             } catch (error) {
                 showMessage('Network error: ' + error.message, 'error', 'add-new');
