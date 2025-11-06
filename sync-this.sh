@@ -42,3 +42,8 @@ git pull origin main
 echo "Pushing local changes to origin main..."
 git push origin main
 
+# --- PAUSE ADDED HERE ---
+echo ""
+echo "Press Enter to continue with Pull/Push..."
+read -r DUMMY_VAR
+
