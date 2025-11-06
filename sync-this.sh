@@ -44,6 +44,6 @@ git push origin main
 
 # --- PAUSE ADDED HERE ---
 echo ""
-echo "Press Enter to continue with Pull/Push..."
+echo "Press Enter to continue ..."
 read -r DUMMY_VAR
 
