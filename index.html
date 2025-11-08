@@ -626,6 +626,44 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
             setTimeout(() => msgDiv.classList.remove('show'), 5000);
         }
 
+        // Build a helpful display message when backend returns errors (OneDrive/Excel specific suggestions)
+        function buildBackendDisplayMessage(data) {
+            // If the backend returned an error, append helpful suggestions for common OneDrive/Excel issues.
+            let displayMessage = `✗ ${data && data.message ? data.message : 'Unknown error'}`;
+
+            try {
+                const msg = (data && data.message) ? data.message : '';
+                let suggestions = '';
+
+                // Invalid argument / Errno 22 -> possibly file in cloud (OneDrive placeholder)
+                if ((msg.includes("Invalid argument") || msg.includes("Errno 22")) &&
+                    (msg.includes("MoviesShows.xlsx") || msg.includes("OneDrive") || msg.includes("MS/MoviesShows.xlsx"))) {
+                    suggestions += ' Is the file still in the cloud?';
+                }
+
+                // Permission denied / Errno 13 -> possibly file is open/locked by another process
+                if ((msg.includes("Permission denied") || msg.includes("Errno 13")) &&
+                    (msg.includes("MoviesShows.xlsx") || msg.includes("OneDrive") || msg.includes("MS/MoviesShows.xlsx"))) {
+                    suggestions += ' Is the file open?';
+                }
+
+                if (suggestions) {
+                    displayMessage += suggestions;
+                }
+            } catch (innerErr) {
+                // ignore parsing errors, just show the original message
+            }
+
+            return displayMessage;
+        }
+
+        // Convenience wrapper to show backend error and return the composed message
+        function showBackendError(data, tab) {
+            const displayMessage = buildBackendDisplayMessage(data);
+            showMessage(displayMessage, 'error', tab);
+            return displayMessage;
+        }
+
         async function loadRows(tab) {
             showMessage('Loading data from Excel...', 'warning', tab);
             try {
@@ -636,8 +674,8 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
                     renderTable(tab);
                     showMessage('Successfully loaded ' + allRows.length + ' rows.', 'success', tab);
                 } else {
-                    showMessage('Error loading data: ' + data.message, 'error', tab);
-                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + data.message + '</p>';
+                    const display = showBackendError(data, tab);
+                    dataViewContainer.innerHTML = '<p style="color: red;">Error: ' + escapeHtml(display) + '</p>';
                 }
             } catch (error) {
                 showMessage('Network error: Could not connect to backend. ' + error.message, 'error', tab);
@@ -820,7 +858,7 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
                 } else {
                     row.classList.remove('editing');
                     currentlyEditingRow = null;
-                    showMessage(data.message, 'error', 'data-view');
+                    showBackendError(data, 'data-view');
                     loadRows('data-view');
                 }
             } catch (error) {
@@ -874,7 +912,7 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
                         }, 100);
                     }
                 } else {
-                    showMessage(data.message, 'error', 'data-view');
+                    showBackendError(data, 'data-view');
                 }
             } catch (error) {
                 showMessage('Network error: ' + error.message, 'error', 'data-view');
@@ -898,7 +936,7 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
                     allRows = [];
                     loadRows('data-view');
                 } else {
-                    showMessage(data.message, 'error', 'data-view');
+                    showBackendError(data, 'data-view');
                 }
             } catch (error) {
                 showMessage('Network error: ' + error.message, 'error', 'data-view');
@@ -951,7 +989,7 @@ window.addEventListener('DOMContentLoaded', () => openTab('data-view'));
                         openTab('data-view');
                     }, 3000);
                 } else {
-                    showMessage('✗ ERROR: ' + data.message, 'error', 'add-new');
+                    showBackendError(data, 'add-new');
                 }
             } catch (error) {
                 showMessage('Network error: ' + error.message, 'error', 'add-new');
