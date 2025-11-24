@@ -17,7 +17,7 @@ Tunnel: api-edit.ldmathes.cc (new subdomain)
 Frontend:
 
 excel-web-interface/ → calls api.ldmathes.cc (port 5000)
-MoviesShowsFullEdit/ → calls api-edit.ldmathes.cc (port 5001)
+movies-shows-edit/ → calls api-edit.ldmathes.cc (port 5001)
 
 
 
@@ -97,7 +97,7 @@ Test Port 5001 (New Full Editor)
 
 Backend: https://api-edit.ldmathes.cc/api/health
 Backend data: https://api-edit.ldmathes.cc/api/data
-Form: https://dennyrgood.github.io/MoviesShowsFullEdit/
+Form: https://dennyrgood.github.io/movies-show-edit/
 
 Test Hub
 

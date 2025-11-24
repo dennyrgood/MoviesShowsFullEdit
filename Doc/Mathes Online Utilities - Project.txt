@@ -76,7 +76,7 @@ A web-based system for managing Excel spreadsheets and other utilities from anyw
 
 **Frontend:**
 - Path: `/MoviesShowsFullEdit/`
-- URL: `https://dennyrgood.github.io/MoviesShowsFullEdit/`
+- URL: `https://dennyrgood.github.io/movies-shows-full-edit`
 - Features: 
   - Tab 1: Add new entries
   - Tab 2: Edit existing (dropdown selector, pre-populated form)
@@ -401,7 +401,7 @@ Use any emoji for the icon, examples:
 | `D:\excel-web-interface\` | Local repo clone |
 | `index.html` | Landing page (hub) |
 | `excel-web-interface\index.html` | Quick-add form (if exists) |
-| `MoviesShowsFullEdit\index.html` | Full CRUD editor |
+| `movies-shows-full-edit\index.html` | Full CRUD editor |
 | `index_usdz.html` | USDZ version (if exists) |
 
 ### **Live URLs**
@@ -410,7 +410,7 @@ Use any emoji for the icon, examples:
 |-----|---------|
 | `https://dennyrgood.github.io/` | Landing page hub |
 | `https://dennyrgood.github.io/excel-web-interface/` | Quick-add form |
-| `https://dennyrgood.github.io/MoviesShowsFullEdit/` | Full CRUD editor |
+| `https://dennyrgood.github.io/movies-shows-full-edit` | Full CRUD editor |
 | `https://api.ldmathes.cc/api/health` | Port 5000 backend health |
 | `https://api-edit.ldmathes.cc/api/health` | Port 5001 backend health |
 
