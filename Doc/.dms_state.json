@@ -1,0 +1,121 @@
+{
+  "metadata": {
+    "created": "2025-11-25T00:23:46.335194",
+    "last_scan": null,
+    "last_apply": "2025-11-25T00:29:07.050562"
+  },
+  "categories": [
+    "Guides",
+    "Workflows",
+    "scripts",
+    "Models",
+    "QuickRefs",
+    "Junk"
+  ],
+  "documents": {
+    "./Mathes Online Utilities - Project Documentation.pdf": {
+      "hash": "sha256:f18a5b574af1eee0610e60b1221c8cbdcff8b3623499d99009959b299bfdaad6",
+      "category": "Guides",
+      "summary": "Documentation for Mathes Online Utilities project detailing web-based Excel spreadsheet management using Flask backends and GitHub Pages.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Project Documentation",
+      "last_processed": "2025-11-25T00:24:59.344523",
+      "file_mtime": "2025-11-08T02:07:06.522884",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Project Documentation.md"
+    },
+    "./github has official html.txt": {
+      "hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "Guides",
+      "summary": "This document outlines the official HTML representation of GitHub repositories and provides guidance on how to access and utilize it.",
+      "summary_approved": true,
+      "title": "github has official html",
+      "last_processed": "2025-11-25T00:24:59.344656",
+      "file_mtime": "2025-11-08T02:07:06.531427"
+    },
+    "./index.html": {
+      "hash": "",
+      "category": "Guides",
+      "summary": "This document is an HTML index page styled with CSS for project documentation, featuring a sidebar with search and file navigation elements.",
+      "summary_approved": true,
+      "title": "index",
+      "last_processed": "2025-11-25T00:29:07.050537",
+      "file_mtime": "2025-11-25T00:27:05.639471"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS.pdf": {
+      "hash": "sha256:3ec754b1295c4f992ee9056d72ebfa7790ab52e2429280a85ed7eaaebfb3682d",
+      "category": "Workflows",
+      "summary": "This document outlines the shutdown and restart procedure for Mathes Online Utilities services, including stopping scheduled tasks, updating offline status on a landing page, verifying service cessation, and testing endpoint availability.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS",
+      "last_processed": "2025-11-25T00:24:59.344701",
+      "file_mtime": "2025-11-08T02:07:06.527529",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS.md"
+    },
+    "./things-to-do.txt": {
+      "hash": "sha256:5cd84e40fba09a4f954aa6e1c3365d3358a1b175b1e2f79ded05304e6fac1dcd",
+      "category": "Workflows",
+      "summary": "Instructions for updating error messages and user interface elements in a program, including adding notes and modifying text on the landing page.",
+      "summary_approved": true,
+      "title": "things-to-do",
+      "last_processed": "2025-11-25T00:24:59.344722",
+      "file_mtime": "2025-11-08T02:07:06.531667"
+    },
+    "./SetupWeatherProxy.txt": {
+      "hash": "sha256:cae515c3fd4ec61e627daf10aef6b4942a29bbdbcc0512ffe43331cd411ebf75",
+      "category": "Workflows",
+      "summary": "This document describes the execution of a command to set up a Cloudflare tunnel for a weather-flask-proxy service using cloudflared.exe.",
+      "summary_approved": true,
+      "title": "SetupWeatherProxy",
+      "last_processed": "2025-11-25T00:24:59.344760",
+      "file_mtime": "2025-11-08T02:07:06.531383"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist.pdf": {
+      "hash": "sha256:9914f47422d8529087fcf061138fe7f37e77d271c7fa4aecc3189c52cdd5da92",
+      "category": "Workflows",
+      "summary": "This document provides a step-by-step procedure for shutting down and restarting Mathes Online Utilities, including stopping services, updating the landing page status, and verifying system shutdown.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist",
+      "last_processed": "2025-11-25T00:24:59.344778",
+      "file_mtime": "2025-11-08T02:07:06.530396",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist.md"
+    },
+    "./RevisedArchitectureTwoBackendsRunning.txt": {
+      "hash": "sha256:0fdf568ab1f9ac1d7ce8fe9c4579675d77106a76b19a3055305509c8e83669e0",
+      "category": "Guides",
+      "summary": "Document outlines the setup process for running two backend services on different ports and configuring Cloudflare tunnels for each, including automatic startup via Task Scheduler.",
+      "summary_approved": true,
+      "title": "RevisedArchitectureTwoBackendsRunning",
+      "last_processed": "2025-11-25T00:24:59.344795",
+      "file_mtime": "2025-11-24T23:49:28.331028"
+    },
+    "./Mathes Online Utilities - Project.txt": {
+      "hash": "sha256:04cf0d8eb82b1f715ea80ff0c096ad64e468f2973765460342966c8a1bbf98a4",
+      "category": "Guides",
+      "summary": "Documentation for Mathes Online Utilities project, detailing its architecture using Flask on Windows with Cloudflare Tunnel and GitHub Pages for frontend, including two applications: Excel Quick-Add Form and Movies & Shows Full.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Project",
+      "last_processed": "2025-11-25T00:24:59.344813",
+      "file_mtime": "2025-11-24T23:52:38.847807"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist REVISED.pdf": {
+      "hash": "sha256:79b02d96a4762d01d66f08dfa67d47cf7416341d1e8c6eb0a9d1d076d03e61e1",
+      "category": "Workflows",
+      "summary": "This document outlines the shutdown and verification process for Mathes Online Utilities services using PowerShell commands and Git updates.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist REVISED",
+      "last_processed": "2025-11-25T00:24:59.344829",
+      "file_mtime": "2025-11-08T02:07:06.525565",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist REVISED.md"
+    },
+    "./Screenshot 2025-11-04 190818 Sample of Website.png": {
+      "hash": "sha256:5607f459417e20e23d5d70b04aa33603e8999cab5ffa61db1ba2771538db772f",
+      "category": "QuickRefs",
+      "summary": "This document appears to be a screenshot of a table containing website data with columns for price, availability, title, and URL among others.",
+      "summary_approved": true,
+      "title": "Screenshot 2025-11-04 190818 Sample of Website",
+      "last_processed": "2025-11-25T00:29:07.050495",
+      "file_mtime": "2025-11-08T02:07:06.531188",
+      "readable_version": "./md_outputs/Screenshot 2025-11-04 190818 Sample of Website.txt"
+    }
+  }
+}

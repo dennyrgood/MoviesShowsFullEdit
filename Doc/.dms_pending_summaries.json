@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-11-25T00:29:02.656241",
+  "summaries": [
+    {
+      "file": {
+        "path": "./Screenshot 2025-11-04 190818 Sample of Website.png",
+        "hash": "sha256:5607f459417e20e23d5d70b04aa33603e8999cab5ffa61db1ba2771538db772f",
+        "size": 23246,
+        "readable_version": "./md_outputs/Screenshot 2025-11-04 190818 Sample of Website.txt"
+      },
+      "summary": "This document appears to be a screenshot of a table containing website data with columns for price, availability, title, and URL among others.",
+      "category": "QuickRefs",
+      "is_new_category": false,
+      "title": "Screenshot 2025-11-04 190818 Sample of Website",
+      "timestamp": "2025-11-25T00:28:59.092753"
+    },
+    {
+      "file": {
+        "path": "./index.html",
+        "hash": "",
+        "size": 0
+      },
+      "summary": "This document is an HTML index page styled with CSS for project documentation, featuring a sidebar with search and file navigation elements.",
+      "category": "Guides",
+      "is_new_category": false,
+      "title": "index",
+      "timestamp": "2025-11-25T00:29:02.656157"
+    }
+  ]
+}

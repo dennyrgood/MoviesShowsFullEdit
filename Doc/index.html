@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Docs Index — Doc/</title>
+  <style>
+    :root{
+      --bg:#0f1720;
+      --panel:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#79c0ff;
+      --accent-2:#7ee787;
+      --card:#0f1726;
+      --glass: rgba(255,255,255,0.03);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{display:flex;flex-direction:column;background:linear-gradient(180deg,#071422 0%, #071522 60%);color:#e6eef6}
+    header{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:18px}
+    header h1{font-size:18px;margin:0}
+    header p{margin:0;color:var(--muted);font-size:13px}
+    main{display:flex;flex:1;overflow:hidden}
+    /* left pane */
+    #sidebar{width:420px;max-width:46%;min-width:300px;padding:18px;border-right:1px solid rgba(255,255,255,0.03);overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));}
+    .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+    .search{flex:1;display:flex;align-items:center;background:var(--glass);padding:8px;border-radius:8px}
+    .search input{flex:1;border:0;background:transparent;color:inherit;padding:6px 8px;font-size:14px;outline:none}
+    .search small{color:var(--muted);font-size:12px;margin-left:6px}
+    .category {margin-top:10px}
+    .category h2{margin:6px 0 6px;font-size:13px;color:var(--accent)}
+    ul.files{list-style:none;padding:0;margin:0}
+    li.file{padding:10px;border-radius:8px;margin:6px 0;display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.006));cursor:pointer}
+    li.file:hover{box-shadow:0 2px 14px rgba(2,6,23,0.6)}
+    .file .meta{flex:1}
+    .file .title{color:#dff3ff;font-weight:600;font-size:14px;margin-bottom:4px}
+    .file .title a{color:inherit;text-decoration:none}
+    .file .desc{font-size:13px;color:var(--muted);line-height:1.3}
+    .file .tags{font-size:12px;color:var(--muted);margin-top:6px}
+    .file .fmt{font-size:11px;padding:4px 6px;background:rgba(255,255,255,0.02);border-radius:6px;color:var(--muted);margin-left:6px}
+
+    /* right pane viewer */
+    #viewer{flex:1;display:flex;flex-direction:column;min-width:360px}
+    #viewerHeader{padding:14px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:12px}
+    #viewerHeader h3{margin:0;font-size:15px}
+    #viewerBody{padding:18px;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,0.006), rgba(255,255,255,0.004));display:flex;flex-direction:column}
+    /* content area */
+    #content{max-width:1000px;margin:0 auto;flex:1;display:flex;flex-direction:column;width:100%}
+    /* PDF viewer should take full height */
+    #pdfViewer{height:80vh !important;}
+
+# Scripts dir is 2 levels up from this file's location
+SCRIPTS_DIR = Path(__file__).parent.parent
+
+    /* markdown container */
+    #mdViewer{background:rgba(255,255,255,0.01);padding:18px;border-radius:8px}
+    #mdViewer h1,#mdViewer h2,#mdViewer h3{color:#e8faff}
+    pre code{background:#011627;color:#c9dfff;padding:8px;border-radius:6px;display:block;overflow:auto}
+    a.inline-link{color:var(--accent);text-decoration:none}
+    .small-muted{color:var(--muted);font-size:13px}
+
+    /* RAW viewer: preserve CR/LF and indentation for text files */
+    #rawViewer{
+      display:none;
+      background:rgba(255,255,255,0.02);
+      padding:12px;
+      border-radius:8px;
+      color:var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height:1.45;
+      font-size:13px;
+    }
+
+    /* responsive */
+    @media(max-width:980px){
+      #sidebar{display:block;position:relative;width:100%;max-height:360px;overflow:auto}
+      #viewer{min-height:calc(100vh - 360px)}
+    }
+  </style>
+  <!-- marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<!-- DMS_STATE_JSON (read-only, embedded for reference)
+{
+  "metadata": {
+    "created": "2025-11-25T00:23:46.335194",
+    "last_scan": null,
+    "last_apply": "2025-11-25T00:29:07.050562"
+  },
+  "categories": [
+    "Guides",
+    "Workflows",
+    "scripts",
+    "Models",
+    "QuickRefs",
+    "Junk"
+  ],
+  "documents": {
+    "./Mathes Online Utilities - Project Documentation.pdf": {
+      "hash": "sha256:f18a5b574af1eee0610e60b1221c8cbdcff8b3623499d99009959b299bfdaad6",
+      "category": "Guides",
+      "summary": "Documentation for Mathes Online Utilities project detailing web-based Excel spreadsheet management using Flask backends and GitHub Pages.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Project Documentation",
+      "last_processed": "2025-11-25T00:24:59.344523",
+      "file_mtime": "2025-11-08T02:07:06.522884",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Project Documentation.md"
+    },
+    "./github has official html.txt": {
+      "hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "Guides",
+      "summary": "This document outlines the official HTML representation of GitHub repositories and provides guidance on how to access and utilize it.",
+      "summary_approved": true,
+      "title": "github has official html",
+      "last_processed": "2025-11-25T00:24:59.344656",
+      "file_mtime": "2025-11-08T02:07:06.531427"
+    },
+    "./index.html": {
+      "hash": "",
+      "category": "Guides",
+      "summary": "This document is an HTML index page styled with CSS for project documentation, featuring a sidebar with search and file navigation elements.",
+      "summary_approved": true,
+      "title": "index",
+      "last_processed": "2025-11-25T00:29:07.050537",
+      "file_mtime": "2025-11-25T00:27:05.639471"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS.pdf": {
+      "hash": "sha256:3ec754b1295c4f992ee9056d72ebfa7790ab52e2429280a85ed7eaaebfb3682d",
+      "category": "Workflows",
+      "summary": "This document outlines the shutdown and restart procedure for Mathes Online Utilities services, including stopping scheduled tasks, updating offline status on a landing page, verifying service cessation, and testing endpoint availability.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS",
+      "last_processed": "2025-11-25T00:24:59.344701",
+      "file_mtime": "2025-11-08T02:07:06.527529",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist TUNNELS.md"
+    },
+    "./things-to-do.txt": {
+      "hash": "sha256:5cd84e40fba09a4f954aa6e1c3365d3358a1b175b1e2f79ded05304e6fac1dcd",
+      "category": "Workflows",
+      "summary": "Instructions for updating error messages and user interface elements in a program, including adding notes and modifying text on the landing page.",
+      "summary_approved": true,
+      "title": "things-to-do",
+      "last_processed": "2025-11-25T00:24:59.344722",
+      "file_mtime": "2025-11-08T02:07:06.531667"
+    },
+    "./SetupWeatherProxy.txt": {
+      "hash": "sha256:cae515c3fd4ec61e627daf10aef6b4942a29bbdbcc0512ffe43331cd411ebf75",
+      "category": "Workflows",
+      "summary": "This document describes the execution of a command to set up a Cloudflare tunnel for a weather-flask-proxy service using cloudflared.exe.",
+      "summary_approved": true,
+      "title": "SetupWeatherProxy",
+      "last_processed": "2025-11-25T00:24:59.344760",
+      "file_mtime": "2025-11-08T02:07:06.531383"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist.pdf": {
+      "hash": "sha256:9914f47422d8529087fcf061138fe7f37e77d271c7fa4aecc3189c52cdd5da92",
+      "category": "Workflows",
+      "summary": "This document provides a step-by-step procedure for shutting down and restarting Mathes Online Utilities, including stopping services, updating the landing page status, and verifying system shutdown.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist",
+      "last_processed": "2025-11-25T00:24:59.344778",
+      "file_mtime": "2025-11-08T02:07:06.530396",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist.md"
+    },
+    "./RevisedArchitectureTwoBackendsRunning.txt": {
+      "hash": "sha256:0fdf568ab1f9ac1d7ce8fe9c4579675d77106a76b19a3055305509c8e83669e0",
+      "category": "Guides",
+      "summary": "Document outlines the setup process for running two backend services on different ports and configuring Cloudflare tunnels for each, including automatic startup via Task Scheduler.",
+      "summary_approved": true,
+      "title": "RevisedArchitectureTwoBackendsRunning",
+      "last_processed": "2025-11-25T00:24:59.344795",
+      "file_mtime": "2025-11-24T23:49:28.331028"
+    },
+    "./Mathes Online Utilities - Project.txt": {
+      "hash": "sha256:04cf0d8eb82b1f715ea80ff0c096ad64e468f2973765460342966c8a1bbf98a4",
+      "category": "Guides",
+      "summary": "Documentation for Mathes Online Utilities project, detailing its architecture using Flask on Windows with Cloudflare Tunnel and GitHub Pages for frontend, including two applications: Excel Quick-Add Form and Movies & Shows Full.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Project",
+      "last_processed": "2025-11-25T00:24:59.344813",
+      "file_mtime": "2025-11-24T23:52:38.847807"
+    },
+    "./Mathes Online Utilities - Shutdown & Restart Checklist REVISED.pdf": {
+      "hash": "sha256:79b02d96a4762d01d66f08dfa67d47cf7416341d1e8c6eb0a9d1d076d03e61e1",
+      "category": "Workflows",
+      "summary": "This document outlines the shutdown and verification process for Mathes Online Utilities services using PowerShell commands and Git updates.",
+      "summary_approved": true,
+      "title": "Mathes Online Utilities - Shutdown & Restart Checklist REVISED",
+      "last_processed": "2025-11-25T00:24:59.344829",
+      "file_mtime": "2025-11-08T02:07:06.525565",
+      "readable_version": "./md_outputs/Mathes Online Utilities - Shutdown & Restart Checklist REVISED.md"
+    },
+    "./Screenshot 2025-11-04 190818 Sample of Website.png": {
+      "hash": "sha256:5607f459417e20e23d5d70b04aa33603e8999cab5ffa61db1ba2771538db772f",
+      "category": "QuickRefs",
+      "summary": "This document appears to be a screenshot of a table containing website data with columns for price, availability, title, and URL among others.",
+      "summary_approved": true,
+      "title": "Screenshot 2025-11-04 190818 Sample of Website",
+      "last_processed": "2025-11-25T00:29:07.050495",
+      "file_mtime": "2025-11-08T02:07:06.531188",
+      "readable_version": "./md_outputs/Screenshot 2025-11-04 190818 Sample of Website.txt"
+    }
+  }
+}
+-->
+  <header>
+    <h1>📚 Project Docs</h1>
+    <p>Organized by category • Searchable • Responsive</p>
+  </header>
+
+  <main>
+    <section id="sidebar">
+      <div class="controls">
+        <div class="search">
+          <input type="text" id="searchInput" placeholder="Search..." />
+          <small id="resultCount">0 shown</small>
+        </div>
+      </div>
+
+            <section class="category" data-category="Guides">
+        <h2>Guides</h2>
+        <ul class="files">
+            <li class="file" data-path="./Mathes Online Utilities - Project.txt" data-link="./Mathes Online Utilities - Project.txt">
+      <div class="meta">
+        <div class="title"><a href="#./Mathes Online Utilities - Project.txt" class="file-link">Mathes Online Utilities - Project</a></div>
+        <div class="desc">Documentation for Mathes Online Utilities project, detailing its architecture using Flask on Windows with Cloudflare Tunnel and GitHub Pages for frontend, including two applications: Excel Quick-Add Form and Movies &amp; Shows Full.</div>
+        <div class="tags small-muted">TXT · Guides</div>
+        <div class="mtime">📅 2025-11-24 23:52:38</div>
+      </div>
+            </li>            <li class="file" data-path="./Mathes Online Utilities - Project Documentation.pdf" data-link="./Mathes Online Utilities - Project Documentation.pdf">
+      <div class="meta">
+        <div class="title"><a href="#./Mathes Online Utilities - Project Documentation.pdf" class="file-link">Mathes Online Utilities - Project Documentation</a></div>
+        <div class="desc">Documentation for Mathes Online Utilities project detailing web-based Excel spreadsheet management using Flask backends and GitHub Pages.<br><small><a href="#./md_outputs/Mathes Online Utilities - Project Documentation.md" style="color:var(--accent-2)">📄 View PDF Text</a></small></div>
+        <div class="tags small-muted">PDF · Guides</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./RevisedArchitectureTwoBackendsRunning.txt" data-link="./RevisedArchitectureTwoBackendsRunning.txt">
+      <div class="meta">
+        <div class="title"><a href="#./RevisedArchitectureTwoBackendsRunning.txt" class="file-link">RevisedArchitectureTwoBackendsRunning</a></div>
+        <div class="desc">Document outlines the setup process for running two backend services on different ports and configuring Cloudflare tunnels for each, including automatic startup via Task Scheduler.</div>
+        <div class="tags small-muted">TXT · Guides</div>
+        <div class="mtime">📅 2025-11-24 23:49:28</div>
+      </div>
+            </li>            <li class="file" data-path="./github has official html.txt" data-link="./github has official html.txt">
+      <div class="meta">
+        <div class="title"><a href="#./github has official html.txt" class="file-link">github has official html</a></div>
+        <div class="desc">This document outlines the official HTML representation of GitHub repositories and provides guidance on how to access and utilize it.</div>
+        <div class="tags small-muted">TXT · Guides</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./index.html" data-link="./index.html">
+      <div class="meta">
+        <div class="title"><a href="#./index.html" class="file-link">index</a></div>
+        <div class="desc">This document is an HTML index page styled with CSS for project documentation, featuring a sidebar with search and file navigation elements.</div>
+        <div class="tags small-muted">HTML · Guides</div>
+        <div class="mtime">📅 2025-11-25 00:27:05</div>
+      </div>
+            </li>
+        </ul>
+      </section>
+
+      <section class="category" data-category="Workflows">
+        <h2>Workflows</h2>
+        <ul class="files">
+            <li class="file" data-path="./Mathes Online Utilities - Shutdown &amp; Restart Checklist.pdf" data-link="./Mathes Online Utilities - Shutdown &amp; Restart Checklist.pdf">
+      <div class="meta">
+        <div class="title"><a href="#./Mathes Online Utilities - Shutdown &amp; Restart Checklist.pdf" class="file-link">Mathes Online Utilities - Shutdown &amp; Restart Checklist</a></div>
+        <div class="desc">This document provides a step-by-step procedure for shutting down and restarting Mathes Online Utilities, including stopping services, updating the landing page status, and verifying system shutdown.<br><small><a href="#./md_outputs/Mathes Online Utilities - Shutdown &amp; Restart Checklist.md" style="color:var(--accent-2)">📄 View PDF Text</a></small></div>
+        <div class="tags small-muted">PDF · Workflows</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./Mathes Online Utilities - Shutdown &amp; Restart Checklist REVISED.pdf" data-link="./Mathes Online Utilities - Shutdown &amp; Restart Checklist REVISED.pdf">
+      <div class="meta">
+        <div class="title"><a href="#./Mathes Online Utilities - Shutdown &amp; Restart Checklist REVISED.pdf" class="file-link">Mathes Online Utilities - Shutdown &amp; Restart Checklist REVISED</a></div>
+        <div class="desc">This document outlines the shutdown and verification process for Mathes Online Utilities services using PowerShell commands and Git updates.<br><small><a href="#./md_outputs/Mathes Online Utilities - Shutdown &amp; Restart Checklist REVISED.md" style="color:var(--accent-2)">📄 View PDF Text</a></small></div>
+        <div class="tags small-muted">PDF · Workflows</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./Mathes Online Utilities - Shutdown &amp; Restart Checklist TUNNELS.pdf" data-link="./Mathes Online Utilities - Shutdown &amp; Restart Checklist TUNNELS.pdf">
+      <div class="meta">
+        <div class="title"><a href="#./Mathes Online Utilities - Shutdown &amp; Restart Checklist TUNNELS.pdf" class="file-link">Mathes Online Utilities - Shutdown &amp; Restart Checklist TUNNELS</a></div>
+        <div class="desc">This document outlines the shutdown and restart procedure for Mathes Online Utilities services, including stopping scheduled tasks, updating offline status on a landing page, verifying service cessation, and testing endpoint availability.<br><small><a href="#./md_outputs/Mathes Online Utilities - Shutdown &amp; Restart Checklist TUNNELS.md" style="color:var(--accent-2)">📄 View PDF Text</a></small></div>
+        <div class="tags small-muted">PDF · Workflows</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./SetupWeatherProxy.txt" data-link="./SetupWeatherProxy.txt">
+      <div class="meta">
+        <div class="title"><a href="#./SetupWeatherProxy.txt" class="file-link">SetupWeatherProxy</a></div>
+        <div class="desc">This document describes the execution of a command to set up a Cloudflare tunnel for a weather-flask-proxy service using cloudflared.exe.</div>
+        <div class="tags small-muted">TXT · Workflows</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>            <li class="file" data-path="./things-to-do.txt" data-link="./things-to-do.txt">
+      <div class="meta">
+        <div class="title"><a href="#./things-to-do.txt" class="file-link">things-to-do</a></div>
+        <div class="desc">Instructions for updating error messages and user interface elements in a program, including adding notes and modifying text on the landing page.</div>
+        <div class="tags small-muted">TXT · Workflows</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>
+        </ul>
+      </section>
+
+      <section class="category" data-category="QuickRefs">
+        <h2>QuickRefs</h2>
+        <ul class="files">
+            <li class="file" data-path="./Screenshot 2025-11-04 190818 Sample of Website.png" data-link="./Screenshot 2025-11-04 190818 Sample of Website.png">
+      <div class="meta">
+        <div class="title"><a href="#./Screenshot 2025-11-04 190818 Sample of Website.png" class="file-link">Screenshot 2025-11-04 190818 Sample of Website</a></div>
+        <div class="desc">This document appears to be a screenshot of a table containing website data with columns for price, availability, title, and URL among others.<br><small><a href="#./md_outputs/Screenshot 2025-11-04 190818 Sample of Website.txt" style="color:var(--accent-2)">📄 View OCR Text</a></small></div>
+        <div class="tags small-muted">PNG · QuickRefs</div>
+        <div class="mtime">📅 2025-11-08 02:07:06</div>
+      </div>
+            </li>
+        </ul>
+      </section>
+
+
+    </section>
+
+    <section id="viewer">
+      <div id="viewerHeader">
+        <h3 id="viewerTitle">Select a document to view</h3>
+      </div>
+      <div id="viewerBody">
+        <div id="content">
+          <div id="mdViewer"></div>
+          <div id="rawViewer"></div>
+          <iframe id="pdfViewer" style="width:100%;height:100%;border:none;display:none;"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const resultCount = document.getElementById('resultCount');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const mdViewer = document.getElementById('mdViewer');
+    const rawViewer = document.getElementById('rawViewer');
+    const pdfViewer = document.getElementById('pdfViewer');
+
+    function extOf(path) {
+      const ext = path.split('.').pop()?.toLowerCase() || '';
+      return ext.length <= 5 ? ext : '';
+    }
+
+    function safeFetchText(path) {
+      return fetch(path).then(r => r.text());
+    }
+
+    function openFilePreview(liElement) {
+      let path, title;
+      
+      // Handle both element and string path inputs
+      if(typeof liElement === 'string') {
+        path = liElement;
+        title = path.split('/').pop().split('.')[0];
+      } else {
+        path = liElement.dataset.path;
+        title = liElement.querySelector('.title')?.innerText || 'Document';
+      }
+      
+      const pdf = (liElement.dataset?.pdf || '');
+      
+      viewerTitle.innerText = title;
+      mdViewer.style.display = 'none';
+      pdfViewer.style.display = 'none';
+      rawViewer.style.display = 'none';
+      
+      const e = extOf(path);
+      
+      // For DOCX files: show markdown version by default
+      if(e === 'docx' || e === 'doc'){
+        const mdPath = './md_outputs/' + path.split('/').pop().split('.')[0] + '.md';
+        safeFetchText(mdPath).then(txt=>{
+          mdViewer.innerHTML = marked.parse(txt);
+          mdViewer.style.display = 'block';
+          const docxInfo = document.createElement('div');
+          docxInfo.className = 'small-muted';
+          docxInfo.style.marginBottom = '12px';
+          docxInfo.innerHTML = `Source DOCX: <a class="inline-link" href="${path}" target="_blank" rel="noopener">📥 Download ${path}</a>`;
+          if(mdViewer.firstChild) mdViewer.insertBefore(docxInfo, mdViewer.firstChild);
+          else mdViewer.appendChild(docxInfo);
+        }).catch(err=>{
+          rawViewer.style.display = 'block';
+          rawViewer.innerHTML = `
+            <div style="padding: 12px;">
+              <p style="margin-top: 0;">DOCX file options:</p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="${path}" target="_blank" rel="noopener" style="padding: 8px 12px; background: var(--accent); color: #000; border-radius: 6px; text-decoration: none; font-weight: 500;">📥 Download File</a>
+              </div>
+              <p style="color: var(--muted); font-size: 13px; margin-top: 12px;">Converted markdown preview not available</p>
+            </div>
+          `;
+        });
+        return;
+      }
+      
+      if(e === 'md' || path.endsWith('.md') || path.includes('md_outputs')){
+        safeFetchText(path).then(txt=>{
+          mdViewer.innerHTML = marked.parse(txt);
+          mdViewer.style.display = 'block';
+          if(pdf){
+            const orig = document.createElement('div');
+            orig.className = 'small-muted';
+            orig.innerHTML = `Source PDF: <a class="inline-link" href="${pdf}" target="_blank" rel="noopener">${pdf}</a>`;
+            if(mdViewer.firstChild) mdViewer.insertBefore(orig, mdViewer.firstChild);
+            else mdViewer.appendChild(orig);
+          }
+        }).catch(err=>{
+          rawViewer.style.display = 'block';
+          rawViewer.textContent = 'Failed to load markdown: ' + err;
+        });
+        return;
+      }
+      
+      if(e === 'pdf' || pdf.toLowerCase().endsWith('.pdf')){
+        const pdfPath = (e === 'pdf') ? path : pdf;
+        pdfViewer.src = pdfPath;
+        pdfViewer.style.display = 'block';
+        return;
+      }
+      
+      // Handle images
+      if(['png','jpg','jpeg','gif','webp','bmp','svg'].includes(e)){
+        rawViewer.style.display = 'block';
+        rawViewer.innerHTML = `<img src="${path}" style="max-width:100%;max-height:600px;border-radius:8px;" alt="${title}">`;
+        return;
+      }
+      
+      if(['txt','log','out'].includes(e) || e.length<=4){
+        safeFetchText(path).then(txt=>{
+          rawViewer.style.display = 'block';
+          rawViewer.textContent = txt;
+        }).catch(err=>{
+          rawViewer.style.display = 'block';
+          rawViewer.textContent = 'Failed to load file: ' + err;
+        });
+        return;
+      }
+      
+      rawViewer.style.display = 'block';
+      rawViewer.innerHTML = `Open file: <a class="inline-link" href="${path}" target="_blank" rel="noopener">${path}</a>`;
+    }
+
+    function filterFiles(q){
+      q = (q||'').toLowerCase().trim();
+      const files = document.querySelectorAll('li.file');
+      let visible = 0;
+      files.forEach(li=>{
+        const title = li.querySelector('.title').innerText.toLowerCase();
+        const desc = li.querySelector('.desc').innerText.toLowerCase();
+        const tags = li.querySelector('.tags').innerText.toLowerCase();
+        if(!q || title.includes(q) || desc.includes(q) || tags.includes(q)){
+          li.style.display = '';
+          visible++;
+        } else {
+          li.style.display = 'none';
+        }
+      });
+      resultCount.textContent = visible ? `${visible} shown` : 'no results';
+    }
+
+    searchInput.addEventListener('input', (e)=>{
+      filterFiles(e.target.value);
+    });
+
+    window.addEventListener('load', ()=>{
+      const hash = decodeURIComponent(location.hash.replace(/^#/,''));
+      if(hash){
+        const el = Array.from(document.querySelectorAll('li.file')).find(li=>{
+          return li.dataset.path===hash || li.dataset.pdf===hash || li.querySelector('.title').innerText===hash;
+        });
+        if(el) openFilePreview(el);
+        else if(hash) openFilePreview(hash);  // If no li found, try opening the path directly
+      }
+      filterFiles('');
+    });
+
+    // Handle hash changes (when clicking image/file links)
+    window.addEventListener('hashchange', ()=>{
+      const hash = decodeURIComponent(location.hash.replace(/^#/,''));
+      if(hash){
+        const el = Array.from(document.querySelectorAll('li.file')).find(li=>{
+          return li.dataset.path===hash || li.dataset.pdf===hash || li.querySelector('.title').innerText===hash;
+        });
+        if(el) openFilePreview(el);
+        else if(hash) openFilePreview(hash);  // If no li found, try opening the path directly
+      }
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key==='/' && document.activeElement !== searchInput){
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    // Attach click handler to all file entries
+    document.addEventListener('click', (e)=>{
+      const li = e.target.closest('li.file');
+      if(li) openFilePreview(li);
+    });
+  </script>
+</body>
+</html>
